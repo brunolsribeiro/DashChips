@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Serviço de Mensageria - Controle de Chips</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.3s ease;
+        }
+
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .last-edit {
+            font-size: 12px;
+            opacity: 0.85;
+            font-style: italic;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .filters-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filters-header h2 {
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .table-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header h2 {
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--light-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px 10px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--border-color);
+        }
+
+        th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.5;
+        }
+
+        th.sorted-asc::after {
+            content: ' ↑';
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        th.sorted-desc::after {
+            content: ' ↓';
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        td {
+            padding: 15px 10px;
+            font-size: 13px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: var(--light-bg);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-business {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-messenger {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .badge-s1 {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-s2 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-ativo {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-inativo {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-cancelado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .municipio-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+
+        .pagination {
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination-select {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .pagination-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pagination-buttons button {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .pagination-buttons button:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group label .required {
+            color: var(--danger-color);
+            margin-left: 2px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group input.error,
+        .form-group select.error,
+        .form-group textarea.error {
+            border-color: var(--danger-color);
+        }
+
+        .error-message {
+            display: none;
+            color: var(--danger-color);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error {
+            background: var(--danger-color);
+        }
+
+        .toast.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .header-right {
+                align-items: center;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .export-buttons button {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 10px 5px;
+                font-size: 11px;
+            }
+
+            .modal {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .pagination-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🚀 Dashboard Serviço de Mensageria</h1>
+                <p>Controle de Chips e APIs</p>
+            </div>
+            <div class="header-right">
+                <div class="last-edit" id="lastEdit">Última edição em -- por --</div>
+                <button class="theme-toggle" onclick="toggleTheme()">🌓 Alternar Tema</button>
+            </div>
+        </div>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-title">Total de Chips</div>
+                <div class="card-value" id="totalChips">0</div>
+                <div class="card-subtitle">Registrados no sistema</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Municípios Atendidos</div>
+                <div class="card-value" id="totalMunicipios">0</div>
+                <div class="card-subtitle">Cidades com cobertura</div>
+            </div>
+            <div class="card">
+                <div class="card-title">EVOs Ativos</div>
+                <div class="card-value" id="totalEvos">0</div>
+                <div class="card-subtitle">Servidores</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chips Ativos</div>
+                <div class="card-value" id="chipsAtivos">0</div>
+                <div class="card-subtitle">Conectados e operacionais</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Business</div>
+                <div class="card-value" id="chipsBusiness">0</div>
+                <div class="card-subtitle">WhatsApp Business</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Restritos/Banidos</div>
+                <div class="card-value" id="chipsRestritos">0</div>
+                <div class="card-subtitle">Requerem atenção</div>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-header">
+                <h2>🔍 Filtros e Busca</h2>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="searchTelefone">Buscar por Telefone</label>
+                    <input type="text" id="searchTelefone" placeholder="Digite o número..." onkeyup="aplicarFiltros()">
+                </div>
+                <div class="filter-group">
+                    <label for="filterMunicipio">Filtrar por Município</label>
+                    <select id="filterMunicipio" onchange="aplicarFiltros()">
+                        <option value="">Todos os Municípios</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterStatus">Filtrar por Status</label>
+                    <select id="filterStatus" onchange="aplicarFiltros()">
+                        <option value="">Todos os Status</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterEvo">Filtrar por EVO</label>
+                    <select id="filterEvo" onchange="aplicarFiltros()">
+                        <option value="">Todos os EVOs</option>
+                        <option value="EVO 1">EVO 1</option>
+                        <option value="EVO 2">EVO 2</option>
+                        <option value="EVO 3">EVO 3</option>
+                        <option value="EVO 4">EVO 4</option>
+                        <option value="EVO 5">EVO 5</option>
+                        <option value="EVO 6">EVO 6</option>
+                        <option value="EVO 7">EVO 7</option>
+                        <option value="EVO 8">EVO 8</option>
+                        <option value="EVO 9">EVO 9</option>
+                        <option value="EVO 10">EVO 10</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="limparFiltros()">🔄 Limpar Filtros</button>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <div class="table-header">
+                <h2>📋 Registro de Chips por Município</h2>
+                <div class="export-buttons">
+                    <button class="btn btn-warning" onclick="solicitarAutenticacao('novo')">➕ CADASTRAR NOVO</button>
+                    <button class="btn btn-success" onclick="exportarPDF()">📄 Exportar PDF</button>
+                    <button class="btn btn-primary" onclick="exportarExcel()">📊 Exportar Excel</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="tabelaChips">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="ordenarTabela(0)">Município</th>
+                            <th class="sortable" onclick="ordenarTabela(1)">Status</th>
+                            <th class="sortable" onclick="ordenarTabela(2)">Telefone</th>
+                            <th class="sortable" onclick="ordenarTabela(3)">EVO</th>
+                            <th class="sortable" onclick="ordenarTabela(4)">Aparelho</th>
+                            <th class="sortable" onclick="ordenarTabela(5)">SIM</th>
+                            <th class="sortable" onclick="ordenarTabela(6)">Tipo WhatsApp</th>
+                            <th class="sortable" onclick="ordenarTabela(7)" id="headerCenario">Cenário 01/02/2026</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBody">
+                        <tr>
+                            <td colspan="9" class="loading">Carregando dados...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">
+                    <span id="paginationInfo">Mostrando 0 de 0 registros</span>
+                    <select class="pagination-select" id="itensPorPaginaSelect" onchange="mudarItensPorPagina()">
+                        <option value="25">25 por página</option>
+                        <option value="50">50 por página</option>
+                        <option value="100">100 por página</option>
+                    </select>
+                </div>
+                <div class="pagination-buttons">
+                    <button onclick="mudarPagina(-1)" id="btnAnterior">← Anterior</button>
+                    <button onclick="mudarPagina(1)" id="btnProxima">Próxima →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="modal-overlay" id="modalAuth">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔐 Autenticação Necessária</h3>
+                <button class="modal-close" onclick="fecharModal('modalAuth')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="authLogin">Login <span class="required">*</span></label>
+                    <input type="text" id="authLogin" placeholder="nome.sobrenome">
+                    <div class="error-message" id="errorLogin">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="authSenha">Senha <span class="required">*</span></label>
+                    <input type="password" id="authSenha" placeholder="Digite sua senha">
+                    <div class="error-message" id="errorSenha">Campo obrigatório</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalAuth')">Cancelar</button>
+                <button class="btn btn-primary" onclick="validarAutenticacao()">Acessar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalEdit">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalEditTitle">Editar Registro</h3>
+                <button class="modal-close" onclick="fecharModal('modalEdit')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editMunicipio">Município <span class="required">*</span></label>
+                    <select id="editMunicipio">
+                        <option value="">Selecione...</option>
+                        <option value="BOM JESUS">BOM JESUS</option>
+                        <option value="BÚZIOS">BÚZIOS</option>
+                        <option value="CABO FRIO">CABO FRIO</option>
+                        <option value="CARAPEBUS">CARAPEBUS</option>
+                        <option value="ITAPERUNA">ITAPERUNA</option>
+                        <option value="MENDES">MENDES</option>
+                        <option value="NOVA IGUAÇU">NOVA IGUAÇU</option>
+                        <option value="PETRÓPOLIS">PETRÓPOLIS</option>
+                        <option value="RESENDE">RESENDE</option>
+                        <option value="RIO BONITO">RIO BONITO</option>
+                        <option value="SAPUCAIA">SAPUCAIA</option>
+                        <option value="SÃO JOÃO DE MERITI">SÃO JOÃO DE MERITI</option>
+                        <option value="HOMOLOGAÇÃO">HOMOLOGAÇÃO</option>
+                        <option value="MATURAÇÃO">MATURAÇÃO</option>
+                    </select>
+                    <div class="error-message" id="errorMunicipio">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Status <span class="required">*</span></label>
+                    <select id="editStatus">
+                        <option value="">Selecione...</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                    <div class="error-message" id="errorStatus">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editTelefone">Telefone <span class="required">*</span></label>
+                    <input type="tel" id="editTelefone" placeholder="(XX) XXXXX-XXXX">
+                    <div class="error-message" id="errorTelefone">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editEvo">EVO <span class="required">*</span></label>
+                    <select id="editEvo">
+                        <option value="">Selecione...</option>
+                        <option value="EVO 1">EVO 1</option>
+                        <option value="EVO 2">EVO 2</option>
+                        <option value="EVO 3">EVO 3</option>
+                        <option value="EVO 4">EVO 4</option>
+                        <option value="EVO 5">EVO 5</option>
+                        <option value="EVO 6">EVO 6</option>
+                        <option value="EVO 7">EVO 7</option>
+                        <option value="EVO 8">EVO 8</option>
+                        <option value="EVO 9">EVO 9</option>
+                        <option value="EVO 10">EVO 10</option>
+                    </select>
+                    <div class="error-message" id="errorEvo">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editAparelho">Aparelho <span class="required">*</span></label>
+                    <input type="text" id="editAparelho" placeholder="Ex: 31">
+                    <div class="error-message" id="errorAparelho">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editSim">SIM <span class="required">*</span></label>
+                    <select id="editSim">
+                        <option value="">Selecione...</option>
+                        <option value="S1">S1</option>
+                        <option value="S2">S2</option>
+                    </select>
+                    <div class="error-message" id="errorSim">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editTipoWhatsApp">Tipo WhatsApp <span class="required">*</span></label>
+                    <select id="editTipoWhatsApp">
+                        <option value="">Selecione...</option>
+                        <option value="B">Business</option>
+                        <option value="M">Messenger</option>
+                    </select>
+                    <div class="error-message" id="errorTipoWhatsApp">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editCenario">Observações do Cenário</label>
+                    <textarea id="editCenario" placeholder="Ex: Desconectado, Ligado, etc..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalEdit')">Cancelar</button>
+                <button class="btn btn-success" onclick="salvarRegistro()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        function parseStatusInfo(statusInfo) {
+            const partes = statusInfo.split('-').map(p => p.trim());
+            if (partes.length === 3) {
+                return { aparelho: partes[0], sim: partes[1].toUpperCase(), tipoWhatsApp: partes[2].toUpperCase() };
+            }
+            return { aparelho: '-', sim: '-', tipoWhatsApp: 'B' };
+        }
+
+        function obterDataAtual() {
+            const hoje = new Date();
+            return hoje.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function obterChaveDataAtual() {
+            const hoje = new Date();
+            return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+        }
+
+        const dadosChipsRaw = [
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99313-2203", evo: "EVO 5", statusInfo: "31 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99208-3402", evo: "EVO 4", statusInfo: "26 - S2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99251-6827", evo: "EVO 5", statusInfo: "30 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99281-8546", evo: "EVO 5", statusInfo: "29 - s2 - B", cenario: "Ligado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99395-9978", evo: "EVO 5", statusInfo: "28 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99251-8233", evo: "EVO 5", statusInfo: "27 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99203-3067", evo: "EVO 4", statusInfo: "25 - S2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99264-4814", evo: "EVO 4", statusInfo: "24 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99298-5206", evo: "EVO 4", statusInfo: "23 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99224-0701", evo: "EVO 4", statusInfo: "22 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99325-9941", evo: "EVO 4", statusInfo: "21 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99254-7442", evo: "EVO 4", statusInfo: "20 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99209-5761", evo: "EVO 4", statusInfo: "19 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99231-1912", evo: "EVO 4", statusInfo: "18 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99295-3979", evo: "EVO 4", statusInfo: "17 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99267-4699", evo: "EVO 4", statusInfo: "16 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99200-5207", evo: "EVO 4", statusInfo: "15 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99220-8595", evo: "EVO 4", statusInfo: "14 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99267-9741", evo: "EVO 4", statusInfo: "13 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99204-2451", evo: "EVO 4", statusInfo: "12 - s2 - B", cenario: "Desconectado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99201-6293", evo: "EVO 4", statusInfo: "11 - s2 - B", cenario: "Desconectado"},
+            {municipio: "BOM JESUS", telefone: "(22) 99216-7244", evo: "EVO 3", statusInfo: "10 - s2 - B", cenario: "Ligado"},
+            {municipio: "BOM JESUS", telefone: "(22) 99227-1210", evo: "EVO 3", statusInfo: "9 - s2 - B", cenario: "Ligado"},
+            {municipio: "BOM JESUS", telefone: "(22) 99228-0897", evo: "EVO 3", statusInfo: "8 - s2 - B", cenario: "Ligado"},
+            {municipio: "BOM JESUS", telefone: "(22) 99104-8810", evo: "EVO 3", statusInfo: "7 - s2 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99272-3912", evo: "EVO 2", statusInfo: "32 - s1 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99258-0667", evo: "EVO 2", statusInfo: "33 - s1 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99202-5409", evo: "EVO 2", statusInfo: "34 - s1 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99101-5144", evo: "EVO 2", statusInfo: "35 - s1 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99275-5611", evo: "EVO 2", statusInfo: "36 - s1 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99284-5821", evo: "EVO 2", statusInfo: "37 - s1 - M", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99276-3144", evo: "EVO 2", statusInfo: "38 - s1 - M", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99283-0080", evo: "EVO 2", statusInfo: "39 - s1 - M", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99264-0012", evo: "EVO 2", statusInfo: "40 - s1 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99258-2894", evo: "EVO 2", statusInfo: "41 - s1 - B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99264-4879", evo: "EVO 1", statusInfo: "42 - s2 - M", cenario: "Maturação"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99279-9929", evo: "EVO 1", statusInfo: "43 - s2 - M", cenario: "Maturação"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97625-3963", evo: "EVO 6", statusInfo: "47 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96610-0141", evo: "EVO 6", statusInfo: "48 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97528-3280", evo: "EVO 6", statusInfo: "49 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97528-0814", evo: "EVO 6", statusInfo: "50 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97528-1253", evo: "EVO 6", statusInfo: "51 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96680-3107", evo: "EVO 7", statusInfo: "52 - s2 - M", cenario: "Desconectado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96671-8985", evo: "EVO 7", statusInfo: "53 - s2 - M", cenario: "Desconectado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 99343-5780", evo: "EVO 7", statusInfo: "54 - s2 - B", cenario: "Desconectado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 99475-0643", evo: "EVO 7", statusInfo: "55 - s2 - B", cenario: "Desconectado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97528-2187", evo: "EVO 7", statusInfo: "56 - s2 - B", cenario: "Desconectado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 99493-0754", evo: "EVO 8", statusInfo: "57 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96612-2918", evo: "EVO 8", statusInfo: "58 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97534-4074", evo: "EVO 8", statusInfo: "59 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96670-3619", evo: "EVO 8", statusInfo: "60 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96670-0429", evo: "EVO 8", statusInfo: "61 - s1 - B", cenario: "Ligado"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96670-5926", evo: "EVO 9", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "CABO FRIO", telefone: "(22) 99262-1125", evo: "EVO 6", statusInfo: "62 - s1 - B", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99235-1906", evo: "EVO 6", statusInfo: "63 - s1 - B", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99228-0414", evo: "EVO 7", statusInfo: "64 - s2 - B", cenario: "Desconectado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99274-8469", evo: "EVO 7", statusInfo: "65 - s2 - B", cenario: "Desconectado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99217-0350", evo: "EVO 8", statusInfo: "66 - s2 - M", cenario: "Maturação"},
+            {municipio: "CABO FRIO", telefone: "(22) 99246-4498", evo: "EVO 8", statusInfo: "67 - s2 - M", cenario: "Maturação"},
+            {municipio: "CABO FRIO", telefone: "(22) 99222-2996", evo: "EVO 9", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "CABO FRIO", telefone: "(22) 99204-5196", evo: "EVO 9", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "CABO FRIO", telefone: "(22) 99269-1822", evo: "EVO 10", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "CABO FRIO", telefone: "(22) 99244-8833", evo: "EVO 10", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "CABO FRIO", telefone: "(22) 99282-7675", evo: "EVO 10", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "RESENDE", telefone: "(24) 99275-8265", evo: "EVO 1", statusInfo: "68 - s1 - B", cenario: "Ligado"},
+            {municipio: "RESENDE", telefone: "(24) 99202-3032", evo: "EVO 1", statusInfo: "69 - s1 - B", cenario: "Ligado"},
+            {municipio: "RESENDE", telefone: "(24) 99222-7704", evo: "EVO 2", statusInfo: "70 - s2 - B", cenario: "Desconectado"},
+            {municipio: "RESENDE", telefone: "(24) 99267-1241", evo: "EVO 2", statusInfo: "71 - s2 - B", cenario: "Desconectado"},
+            {municipio: "RESENDE", telefone: "(24) 99246-8702", evo: "EVO 3", statusInfo: "72 - s2 - M", cenario: "Maturação"},
+            {municipio: "RESENDE", telefone: "(24) 99206-9897", evo: "EVO 3", statusInfo: "73 - s2 - M", cenario: "Maturação"},
+            {municipio: "RESENDE", telefone: "(24) 99206-2069", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "MENDES", telefone: "(24) 99325-7568", evo: "EVO 1", statusInfo: "74 - s1 - B", cenario: "Ligado"},
+            {municipio: "MENDES", telefone: "(24) 99295-9608", evo: "EVO 1", statusInfo: "75 - s1 - B", cenario: "Ligado"},
+            {municipio: "MENDES", telefone: "(24) 99219-9008", evo: "EVO 2", statusInfo: "76 - s2 - B", cenario: "Desconectado"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 99401-2750", evo: "EVO 3", statusInfo: "78 - s2 - M", cenario: "Maturação"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 99292-8839", evo: "EVO 3", statusInfo: "79 - s2 - M", cenario: "Maturação"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 99115-5855", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 96867-1756", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 97433-0969", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 96614-6177", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 97530-2966", evo: "EVO 1", statusInfo: "80 - s1 - B", cenario: "Ligado"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 96672-3471", evo: "EVO 1", statusInfo: "81 - s1 - B", cenario: "Ligado"},
+            {municipio: "BÚZIOS", telefone: "(22) 99262-6681", evo: "EVO 2", statusInfo: "82 - s2 - B", cenario: "Desconectado"},
+            {municipio: "BÚZIOS", telefone: "(22) 99236-1376", evo: "EVO 2", statusInfo: "83 - s2 - B", cenario: "Desconectado"},
+            {municipio: "BÚZIOS", telefone: "(22) 99231-2068", evo: "EVO 3", statusInfo: "84 - s2 - M", cenario: "Maturação"},
+            {municipio: "BÚZIOS", telefone: "(22) 99236-5893", evo: "EVO 3", statusInfo: "85 - s2 - M", cenario: "Maturação"},
+            {municipio: "BÚZIOS", telefone: "(22) 99269-1121", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "BÚZIOS", telefone: "(22) 99282-0756", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "SAPUCAIA", telefone: "(21) 99103-8650", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "SAPUCAIA", telefone: "(21) 99213-4495", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "SAPUCAIA", telefone: "(21) 97506-2288", evo: "EVO 1", statusInfo: "86 - s1 - B", cenario: "Ligado"},
+            {municipio: "SAPUCAIA", telefone: "(21) 99456-6466", evo: "EVO 1", statusInfo: "87 - s1 - B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 97275-6537", evo: "EVO 2", statusInfo: "88 - s2 - B", cenario: "Desconectado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99528-7286", evo: "EVO 2", statusInfo: "89 - s2 - B", cenario: "Desconectado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99059-2635", evo: "EVO 3", statusInfo: "90 - s2 - M", cenario: "Maturação"},
+            {municipio: "RIO BONITO", telefone: "(21) 97452-8824", evo: "EVO 3", statusInfo: "91 - s2 - M", cenario: "Maturação"},
+            {municipio: "RIO BONITO", telefone: "(21) 99362-7984", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "RIO BONITO", telefone: "(21) 99129-4485", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "RIO BONITO", telefone: "(21) 99679-7160", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "RIO BONITO", telefone: "(21) 99863-7413", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "RIO BONITO", telefone: "(21) 99943-2611", evo: "EVO 6", statusInfo: "92 - s1 - B", cenario: "Ligado"},
+            {municipio: "CARAPEBUS", telefone: "(22) 99204-3695", evo: "EVO 7", statusInfo: "94 - s2 - B", cenario: "Desconectado"},
+            {municipio: "CARAPEBUS", telefone: "(22) 99101-7919", evo: "EVO 7", statusInfo: "95 - s2 - B", cenario: "Desconectado"},
+            {municipio: "CARAPEBUS", telefone: "(22) 99219-1966", evo: "EVO 8", statusInfo: "96 - s2 - M", cenario: "Maturação"},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(21) 98604-4133", evo: "EVO 6", statusInfo: "93 - s1 - B", cenario: "Ligado"},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(22) 99245-4049", evo: "EVO 8", statusInfo: "97 - s2 - M", cenario: "Maturação"},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(22) 99276-9948", evo: "EVO 9", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(22) 99233-7566", evo: "EVO 9", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99258-0633", evo: "EVO 1", statusInfo: "44 - s2 - M", cenario: "Maturação"},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99298-1621", evo: "EVO 1", statusInfo: "45 - s2 - B", cenario: "Maturação"},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99278-0105", evo: "EVO 1", statusInfo: "46 - s2 - B", cenario: "Maturação"},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99242-8766", evo: "EVO 2", statusInfo: "77 - s2 - B", cenario: "Desconectado"},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99295-1227", evo: "EVO 3", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "MATURAÇÃO", telefone: "(21) 99396-4497", evo: "EVO 3", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99220-0395", evo: "EVO 3", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99243-4584", evo: "EVO 3", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "MATURAÇÃO", telefone: "(21) 99057-6135", evo: "EVO 3", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "MATURAÇÃO", telefone: "(21) 99102-0546", evo: "EVO 4", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "MATURAÇÃO", telefone: "(21) 96728-7401", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99282-3777", evo: "EVO 5", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "MATURAÇÃO", telefone: "(21) 99740-5631", evo: "EVO 6", statusInfo: "1 - s1 - B", cenario: "Ligado"},
+            {municipio: "MATURAÇÃO", telefone: "(21) 97289-6416", evo: "EVO 7", statusInfo: "2 - s2 - B", cenario: "Desconectado"},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99224-7789", evo: "EVO 8", statusInfo: "3 - s2 - M", cenario: "Maturação"},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99279-5130", evo: "EVO 9", statusInfo: "RESTRITO", cenario: "Restrito"},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99281-3284", evo: "EVO 10", statusInfo: "BANIDO", cenario: "Banido"},
+            {municipio: "MATURAÇÃO", telefone: "(21) 96670-4761", evo: "EVO 10", statusInfo: "BANIDO", cenario: "Banido"}
+        ];
+
+        let proximoId = 1;
+        const dadosChips = dadosChipsRaw.map(chip => {
+            const parsed = parseStatusInfo(chip.statusInfo);
+            const historico = {};
+            historico['2026-02-01'] = { cenario: chip.cenario, usuario: 'sistema' };
+            return {
+                id: proximoId++,
+                ...chip,
+                status: "Ativo",
+                aparelho: parsed.aparelho,
+                sim: parsed.sim,
+                tipoWhatsApp: parsed.tipoWhatsApp,
+                historicoCenarios: historico
+            };
+        });
+
+        let dadosFiltrados = [...dadosChips];
+        let paginaAtual = 1;
+        let itensPorPagina = 25;
+        let colunaOrdenacao = null;
+        let direcaoOrdenacao = 'asc';
+        let modoEdicao = 'novo';
+        let registroEditando = null;
+        let usuarioLogado = '';
+        const credenciais = { senha: 'mensageria' };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarUltimaEdicao();
+            atualizarTituloCenario();
+            inicializarDashboard();
+        });
+
+        function carregarUltimaEdicao() {
+            const ultimaEdicao = localStorage.getItem('ultimaEdicao');
+            if (ultimaEdicao) {
+                const dados = JSON.parse(ultimaEdicao);
+                const dataFormatada = new Date(dados.timestamp).toLocaleString('pt-BR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }).replace(',', ' às');
+                document.getElementById('lastEdit').textContent = `Última edição em ${dataFormatada} por ${dados.usuario}`;
+            }
+        }
+
+        function registrarEdicao(usuario) {
+            const dados = { timestamp: new Date().toISOString(), usuario: usuario };
+            localStorage.setItem('ultimaEdicao', JSON.stringify(dados));
+            carregarUltimaEdicao();
+            atualizarTituloCenario();
+        }
+
+        function atualizarTituloCenario() {
+            const dataAtual = obterDataAtual();
+            document.getElementById('headerCenario').childNodes[0].textContent = `Cenário ${dataAtual}`;
+        }
+
+        function obterUltimaDataCenario() {
+            let ultimaData = '2026-02-01';
+            dadosChips.forEach(chip => {
+                const datas = Object.keys(chip.historicoCenarios);
+                datas.forEach(data => {
+                    if (data > ultimaData) ultimaData = data;
+                });
+            });
+            return ultimaData;
+        }
+
+        function formatarDataParaExibicao(dataISO) {
+            const [ano, mes, dia] = dataISO.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        function ordenarMunicipiosCustomizado(municipios) {
+            const excecoes = ['HOMOLOGAÇÃO', 'MATURAÇÃO'];
+            const normais = municipios.filter(m => !excecoes.includes(m)).sort();
+            const especiais = excecoes.filter(m => municipios.includes(m));
+            return [...normais, ...especiais];
+        }
+
+        function inicializarDashboard() {
+            popularFiltroMunicipios();
+            atualizarDashboardCards();
+            aplicarFiltros();
+        }
+
+        function popularFiltroMunicipios() {
+            const municipios = [...new Set(dadosChips.filter(c => c.status !== 'Cancelado').map(chip => chip.municipio))];
+            const municipiosOrdenados = ordenarMunicipiosCustomizado(municipios);
+            const select = document.getElementById('filterMunicipio');
+            select.innerHTML = '<option value="">Todos os Municípios</option>';
+            municipiosOrdenados.forEach(municipio => {
+                const option = document.createElement('option');
+                option.value = municipio;
+                option.textContent = municipio;
+                select.appendChild(option);
+            });
+        }
+
+        function atualizarDashboardCards() {
+            const chipsAtivos = dadosChips.filter(c => c.status !== 'Cancelado');
+            document.getElementById('totalChips').textContent = chipsAtivos.length;
+            const municipiosUnicos = [...new Set(chipsAtivos.map(chip => chip.municipio))];
+            document.getElementById('totalMunicipios').textContent = municipiosUnicos.length;
+            const evosUnicos = [...new Set(chipsAtivos.map(chip => chip.evo))];
+            document.getElementById('totalEvos').textContent = evosUnicos.length;
+            const chipsConectados = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('LIGADO')).length;
+            document.getElementById('chipsAtivos').textContent = chipsConectados;
+            const chipsBusiness = chipsAtivos.filter(chip => chip.tipoWhatsApp === 'B').length;
+            document.getElementById('chipsBusiness').textContent = chipsBusiness;
+            const chipsRestritos = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('RESTRITO') || chip.cenario.toUpperCase().includes('BANIDO')).length;
+            document.getElementById('chipsRestritos').textContent = chipsRestritos;
+        }
+
+        function aplicarFiltros() {
+            const buscaTelefone = document.getElementById('searchTelefone').value.toLowerCase();
+            const filtroMunicipio = document.getElementById('filterMunicipio').value;
+            const filtroStatus = document.getElementById('filterStatus').value;
+            const filtroEvo = document.getElementById('filterEvo').value;
+
+            dadosFiltrados = dadosChips.filter(chip => {
+                if (chip.status === 'Cancelado') return false;
+                const matchTelefone = chip.telefone.toLowerCase().includes(buscaTelefone);
+                const matchMunicipio = !filtroMunicipio || chip.municipio === filtroMunicipio;
+                const matchStatus = !filtroStatus || chip.status === filtroStatus;
+                const matchEvo = !filtroEvo || chip.evo === filtroEvo;
+                return matchTelefone && matchMunicipio && matchStatus && matchEvo;
+            });
+
+            dadosFiltrados = ordenarDadosPorMunicipio(dadosFiltrados);
+            paginaAtual = 1;
+            renderizarTabela();
+        }
+
+        function ordenarDadosPorMunicipio(dados) {
+            const excecoes = ['HOMOLOGAÇÃO', 'MATURAÇÃO'];
+            const normais = dados.filter(d => !excecoes.includes(d.municipio));
+            const homologacao = dados.filter(d => d.municipio === 'HOMOLOGAÇÃO');
+            const maturacao = dados.filter(d => d.municipio === 'MATURAÇÃO');
+            return [...normais, ...homologacao, ...maturacao];
+        }
+
+        function limparFiltros() {
+            document.getElementById('searchTelefone').value = '';
+            document.getElementById('filterMunicipio').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterEvo').value = '';
+            dadosFiltrados = dadosChips.filter(c => c.status !== 'Cancelado');
+            dadosFiltrados = ordenarDadosPorMunicipio(dadosFiltrados);
+            paginaAtual = 1;
+            renderizarTabela();
+            mostrarToast('Filtros limpos com sucesso!');
+        }
+
+        function obterCenarioAtual(chip) {
+            const ultimaData = obterUltimaDataCenario();
+            return chip.historicoCenarios[ultimaData]?.cenario || chip.cenario;
+        }
+
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabelaBody');
+            const inicio = (paginaAtual - 1) * itensPorPagina;
+            const fim = inicio + itensPorPagina;
+            const dadosPagina = dadosFiltrados.slice(inicio, fim);
+
+            if (dadosPagina.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="loading">Nenhum registro encontrado</td></tr>';
+                atualizarPaginacao();
+                return;
+            }
+
+            tbody.innerHTML = dadosPagina.map(chip => `
+                <tr>
+                    <td><span class="municipio-badge">${chip.municipio}</span></td>
+                    <td><span class="badge badge-${chip.status.toLowerCase()}">${chip.status}</span></td>
+                    <td><strong>${chip.telefone}</strong></td>
+                    <td>${chip.evo}</td>
+                    <td style="text-align: center;">${chip.aparelho}</td>
+                    <td style="text-align: center;"><span class="badge ${chip.sim === 'S1' ? 'badge-s1' : 'badge-s2'}">${chip.sim}</span></td>
+                    <td style="text-align: center;"><span class="badge ${chip.tipoWhatsApp === 'B' ? 'badge-business' : 'badge-messenger'}">${chip.tipoWhatsApp === 'B' ? 'Business' : 'Messenger'}</span></td>
+                    <td>${obterCenarioAtual(chip)}</td>
+                    <td><button class="btn-icon btn-edit" onclick="solicitarAutenticacao('editar', ${chip.id})" title="Editar">✏️</button></td>
+                </tr>
+            `).join('');
+
+            atualizarPaginacao();
+        }
+
+        function atualizarPaginacao() {
+            const totalPaginas = Math.ceil(dadosFiltrados.length / itensPorPagina);
+            const inicio = (paginaAtual - 1) * itensPorPagina + 1;
+            const fim = Math.min(paginaAtual * itensPorPagina, dadosFiltrados.length);
+            document.getElementById('paginationInfo').textContent = `Mostrando ${inicio} a ${fim} de ${dadosFiltrados.length} registros`;
+            document.getElementById('btnAnterior').disabled = paginaAtual === 1;
+            document.getElementById('btnProxima').disabled = paginaAtual >= totalPaginas;
+        }
+
+        function mudarPagina(direcao) {
+            paginaAtual += direcao;
+            renderizarTabela();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mudarItensPorPagina() {
+            itensPorPagina = parseInt(document.getElementById('itensPorPaginaSelect').value);
+            paginaAtual = 1;
+            renderizarTabela();
+        }
+
+        function ordenarTabela(coluna) {
+            const colunas = ['municipio', 'status', 'telefone', 'evo', 'aparelho', 'sim', 'tipoWhatsApp', 'cenario'];
+            const nomColuna = colunas[coluna];
+
+            if (colunaOrdenacao === coluna) {
+                direcaoOrdenacao = direcaoOrdenacao === 'asc' ? 'desc' : 'asc';
+            } else {
+                colunaOrdenacao = coluna;
+                direcaoOrdenacao = 'asc';
+            }
+
+            if (nomColuna === 'municipio') {
+                const excecoes = ['HOMOLOGAÇÃO', 'MATURAÇÃO'];
+                const normais = dadosFiltrados.filter(d => !excecoes.includes(d.municipio));
+                const homologacao = dadosFiltrados.filter(d => d.municipio === 'HOMOLOGAÇÃO');
+                const maturacao = dadosFiltrados.filter(d => d.municipio === 'MATURAÇÃO');
+                normais.sort((a, b) => {
+                    const valorA = a.municipio.toLowerCase();
+                    const valorB = b.municipio.toLowerCase();
+                    if (valorA < valorB) return direcaoOrdenacao === 'asc' ? -1 : 1;
+                    if (valorA > valorB) return direcaoOrdenacao === 'asc' ? 1 : -1;
+                    return 0;
+                });
+                dadosFiltrados = [...normais, ...homologacao, ...maturacao];
+            } else {
+                dadosFiltrados.sort((a, b) => {
+                    let valorA = nomColuna === 'cenario' ? obterCenarioAtual(a) : String(a[nomColuna]);
+                    let valorB = nomColuna === 'cenario' ? obterCenarioAtual(b) : String(b[nomColuna]);
+                    valorA = valorA.toLowerCase();
+                    valorB = valorB.toLowerCase();
+                    if (valorA < valorB) return direcaoOrdenacao === 'asc' ? -1 : 1;
+                    if (valorA > valorB) return direcaoOrdenacao === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            document.querySelectorAll('th').forEach((th, idx) => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+                if (idx === coluna) {
+                    th.classList.add(direcaoOrdenacao === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                }
+            });
+
+            paginaAtual = 1;
+            renderizarTabela();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            mostrarToast('Tema alterado com sucesso!');
+        }
+
+        function solicitarAutenticacao(modo, id = null) {
+            modoEdicao = modo;
+            registroEditando = id;
+            document.getElementById('authLogin').value = '';
+            document.getElementById('authSenha').value = '';
+            document.getElementById('errorLogin').classList.remove('active');
+            document.getElementById('errorSenha').classList.remove('active');
+            abrirModal('modalAuth');
+        }
+
+        function validarAutenticacao() {
+            const login = document.getElementById('authLogin').value.trim();
+            const senha = document.getElementById('authSenha').value;
+            let valido = true;
+
+            if (!login) {
+                document.getElementById('errorLogin').classList.add('active');
+                document.getElementById('authLogin').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('errorLogin').classList.remove('active');
+                document.getElementById('authLogin').classList.remove('error');
+            }
+
+            if (!senha) {
+                document.getElementById('errorSenha').classList.add('active');
+                document.getElementById('authSenha').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('errorSenha').classList.remove('active');
+                document.getElementById('authSenha').classList.remove('error');
+            }
+
+            if (!valido) return;
+
+            const loginPattern = /^[a-zA-ZÀ-ÿ]+\.[a-zA-ZÀ-ÿ]+$/;
+            if (!loginPattern.test(login)) {
+                mostrarToast('Login deve estar no formato: nome.sobrenome', true);
+                return;
+            }
+
+            if (senha === credenciais.senha) {
+                usuarioLogado = login;
+                fecharModal('modalAuth');
+                if (modoEdicao === 'novo') {
+                    abrirModalEdicao();
+                } else if (modoEdicao === 'editar') {
+                    abrirModalEdicao(registroEditando);
+                }
+            } else {
+                mostrarToast('Senha inválida!', true);
+            }
+        }
+
+        function abrirModalEdicao(id = null) {
+            if (id) {
+                const chip = dadosChips.find(c => c.id === id);
+                if (!chip) return;
+                document.getElementById('modalEditTitle').textContent = 'Editar Registro';
+                document.getElementById('editId').value = chip.id;
+                document.getElementById('editMunicipio').value = chip.municipio;
+                document.getElementById('editStatus').value = chip.status;
+                document.getElementById('editTelefone').value = chip.telefone;
+                document.getElementById('editEvo').value = chip.evo;
+                document.getElementById('editAparelho').value = chip.aparelho;
+                document.getElementById('editSim').value = chip.sim;
+                document.getElementById('editTipoWhatsApp').value = chip.tipoWhatsApp;
+                document.getElementById('editCenario').value = obterCenarioAtual(chip);
+            } else {
+                document.getElementById('modalEditTitle').textContent = 'Cadastrar Novo Registro';
+                document.getElementById('editId').value = '';
+                document.getElementById('editMunicipio').value = '';
+                document.getElementById('editStatus').value = 'Ativo';
+                document.getElementById('editTelefone').value = '';
+                document.getElementById('editEvo').value = '';
+                document.getElementById('editAparelho').value = '';
+                document.getElementById('editSim').value = '';
+                document.getElementById('editTipoWhatsApp').value = '';
+                document.getElementById('editCenario').value = '';
+            }
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+            abrirModal('modalEdit');
+        }
+
+        function salvarRegistro() {
+            const id = document.getElementById('editId').value;
+            const municipio = document.getElementById('editMunicipio').value.trim();
+            const status = document.getElementById('editStatus').value;
+            const telefone = document.getElementById('editTelefone').value.trim();
+            const evo = document.getElementById('editEvo').value;
+            const aparelho = document.getElementById('editAparelho').value.trim();
+            const sim = document.getElementById('editSim').value;
+            const tipoWhatsApp = document.getElementById('editTipoWhatsApp').value;
+            const cenario = document.getElementById('editCenario').value.trim();
+
+            let valido = true;
+            const campos = [
+                { id: 'editMunicipio', error: 'errorMunicipio', valor: municipio },
+                { id: 'editStatus', error: 'errorStatus', valor: status },
+                { id: 'editTelefone', error: 'errorTelefone', valor: telefone },
+                { id: 'editEvo', error: 'errorEvo', valor: evo },
+                { id: 'editAparelho', error: 'errorAparelho', valor: aparelho },
+                { id: 'editSim', error: 'errorSim', valor: sim },
+                { id: 'editTipoWhatsApp', error: 'errorTipoWhatsApp', valor: tipoWhatsApp }
+            ];
+
+            campos.forEach(campo => {
+                if (!campo.valor) {
+                    document.getElementById(campo.error).classList.add('active');
+                    document.getElementById(campo.id).classList.add('error');
+                    valido = false;
+                } else {
+                    document.getElementById(campo.error).classList.remove('active');
+                    document.getElementById(campo.id).classList.remove('error');
+                }
+            });
+
+            if (!valido) {
+                mostrarToast('Preencha todos os campos obrigatórios!', true);
+                return;
+            }
+
+            const chaveDataAtual = obterChaveDataAtual();
+
+            if (id) {
+                const index = dadosChips.findIndex(c => c.id === parseInt(id));
+                if (index !== -1) {
+                    dadosChips[index] = {
+                        ...dadosChips[index],
+                        municipio, status, telefone, evo, aparelho, sim, tipoWhatsApp,
+                        cenario: cenario || dadosChips[index].cenario
+                    };
+
+                    if (!dadosChips[index].historicoCenarios) {
+                        dadosChips[index].historicoCenarios = {};
+                    }
+                    dadosChips[index].historicoCenarios[chaveDataAtual] = {
+                        cenario: cenario || dadosChips[index].cenario,
+                        usuario: usuarioLogado
+                    };
+
+                    registrarEdicao(usuarioLogado);
+
+                    if (status === 'Cancelado') {
+                        setTimeout(() => {
+                            dadosChips.splice(index, 1);
+                            aplicarFiltros();
+                            atualizarDashboardCards();
+                            popularFiltroMunicipios();
+                        }, 1000);
+                        mostrarToast('Registro cancelado e removido com sucesso!');
+                    } else {
+                        mostrarToast('Registro atualizado com sucesso!');
+                    }
+                }
+            } else {
+                const historico = {};
+                historico[chaveDataAtual] = { cenario: cenario || 'Novo registro', usuario: usuarioLogado };
+                const novoRegistro = {
+                    id: Math.max(...dadosChips.map(c => c.id)) + 1,
+                    municipio, status, telefone, evo, aparelho, sim, tipoWhatsApp,
+                    cenario: cenario || 'Novo registro',
+                    historicoCenarios: historico
+                };
+                dadosChips.push(novoRegistro);
+                registrarEdicao(usuarioLogado);
+                mostrarToast('Registro cadastrado com sucesso!');
+            }
+
+            fecharModal('modalEdit');
+            aplicarFiltros();
+            atualizarDashboardCards();
+            popularFiltroMunicipios();
+        }
+
+        function abrirModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function mostrarLoading(mostrar) {
+            const overlay = document.getElementById('loadingOverlay');
+            mostrar ? overlay.classList.add('active') : overlay.classList.remove('active');
+        }
+
+        function mostrarToast(mensagem, erro = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.className = 'toast active';
+            if (erro) toast.classList.add('error');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+
+        function exportarPDF() {
+            mostrarLoading(true);
+            setTimeout(() => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('landscape');
+                    const dataAtualFormatada = obterDataAtual();
+
+                    doc.setFontSize(20);
+                    doc.setTextColor(37, 99, 235);
+                    doc.text('Dashboard Serviço de Mensageria', 15, 15);
+
+                    doc.setFontSize(14);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text('Controle de Chips e APIs', 15, 23);
+
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    const dataHoraAtual = new Date().toLocaleString('pt-BR');
+                    doc.text(`Gerado em: ${dataHoraAtual}`, 15, 30);
+                    doc.text(`Total de registros: ${dadosFiltrados.length}`, 15, 35);
+                    doc.setDrawColor(226, 232, 240);
+                    doc.line(15, 38, 282, 38);
+
+                    const headers = [['Município', 'Status', 'Telefone', 'EVO', 'Aparelho', 'SIM', 'Tipo WhatsApp', `Cenário ${dataAtualFormatada}`]];
+                    const dados = dadosFiltrados.map(chip => [
+                        chip.municipio, chip.status, chip.telefone, chip.evo, chip.aparelho, chip.sim,
+                        chip.tipoWhatsApp === 'B' ? 'Business' : 'Messenger',
+                        obterCenarioAtual(chip)
+                    ]);
+
+                    doc.autoTable({
+                        head: headers, body: dados, startY: 42,
+                        styles: { fontSize: 7, cellPadding: 2 },
+                        headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' },
+                        alternateRowStyles: { fillColor: [248, 250, 252] },
+                        margin: { left: 15, right: 15 }
+                    });
+
+                    const pageCount = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        doc.setFontSize(8);
+                        doc.setTextColor(150, 150, 150);
+                        doc.text(`Página ${i} de ${pageCount} | ECO Sistemas © ${new Date().getFullYear()}`,
+                            doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+                    }
+
+                    doc.save(`dashboard-eco-${new Date().toISOString().slice(0, 10)}.pdf`);
+                    mostrarToast('✅ PDF exportado com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao exportar PDF:', error);
+                    mostrarToast('❌ Erro ao exportar PDF', true);
+                } finally {
+                    mostrarLoading(false);
+                }
+            }, 300);
+        }
+
+        function exportarExcel() {
+            mostrarLoading(true);
+            setTimeout(() => {
+                try {
+                    const wb = XLSX.utils.book_new();
+                    const todasDatas = new Set();
+                    dadosFiltrados.forEach(chip => {
+                        Object.keys(chip.historicoCenarios || {}).forEach(data => todasDatas.add(data));
+                    });
+                    const datasOrdenadas = Array.from(todasDatas).sort();
+
+                    const dadosExport = dadosFiltrados.map(chip => {
+                        const linha = {
+                            'Município': chip.municipio,
+                            'Status': chip.status,
+                            'Telefone': chip.telefone,
+                            'EVO': chip.evo,
+                            'Aparelho Telefônico': chip.aparelho,
+                            'SIM': chip.sim,
+                            'Tipo de WhatsApp': chip.tipoWhatsApp === 'B' ? 'Business' : 'Messenger'
+                        };
+
+                        datasOrdenadas.forEach(data => {
+                            const dataFormatada = formatarDataParaExibicao(data);
+                            const usuario = chip.historicoCenarios[data]?.usuario || 'sistema';
+                            const tituloColuna = `Cenário ${dataFormatada} ${usuario}`;
+                            linha[tituloColuna] = chip.historicoCenarios[data]?.cenario || chip.cenario;
+                        });
+
+                        return linha;
+                    });
+
+                    const ws = XLSX.utils.json_to_sheet(dadosExport);
+                    const numColunas = 7 + datasOrdenadas.length;
+                    ws['!cols'] = Array(numColunas).fill({ wch: 20 });
+                    ws['!cols'][0] = { wch: 18 };
+                    ws['!cols'][1] = { wch: 12 };
+                    ws['!cols'][2] = { wch: 18 };
+
+                    XLSX.utils.book_append_sheet(wb, ws, 'Controle de Chips');
+                    XLSX.writeFile(wb, `dashboard-eco-${new Date().toISOString().slice(0, 10)}.xlsx`);
+                    mostrarToast('✅ Excel exportado com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao exportar Excel:', error);
+                    mostrarToast('❌ Erro ao exportar Excel', true);
+                } finally {
+                    mostrarLoading(false);
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
