@@ -103,17 +103,21 @@
 
         .dashboard-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
             margin-bottom: 30px;
         }
 
         .card {
             background: var(--card-bg);
-            padding: 25px;
+            padding: 25px 20px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .card:hover {
@@ -122,23 +126,53 @@
         }
 
         .card-title {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .card-value {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             color: var(--primary-color);
+            margin-bottom: 10px;
         }
 
         .card-subtitle {
             font-size: 12px;
             color: var(--text-secondary);
-            margin-top: 5px;
+        }
+
+        .card-details {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card-detail-item {
+            flex: 1;
+            background: var(--light-bg);
+            padding: 6px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .card-detail-label {
+            font-size: 9px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 3px;
+        }
+
+        .card-detail-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
         .filters-section {
@@ -691,6 +725,18 @@
             }
         }
 
+        @media (max-width: 1400px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -700,6 +746,10 @@
 
             .header-right {
                 align-items: center;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .filters-grid {
@@ -729,6 +779,16 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+
+            .card-details {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -741,7 +801,7 @@
         <div class="header">
             <div class="header-left">
                 <h1>🚀 Dashboard Serviço de Mensageria</h1>
-                <p>Controle de Chips e APIs</p>
+                <p>Controle de Aparelhos, Chips e APIs</p>
             </div>
             <div class="header-right">
                 <div class="last-edit" id="lastEdit">Última edição em -- por --</div>
@@ -756,9 +816,9 @@
                 <div class="card-subtitle">Registrados no sistema</div>
             </div>
             <div class="card">
-                <div class="card-title">Municípios Atendidos</div>
+                <div class="card-title">Clientes Atendidos</div>
                 <div class="card-value" id="totalMunicipios">0</div>
-                <div class="card-subtitle">Cidades com cobertura</div>
+                <div class="card-subtitle">Projetos com cobertura</div>
             </div>
             <div class="card">
                 <div class="card-title">EVOs Ativos</div>
@@ -768,17 +828,31 @@
             <div class="card">
                 <div class="card-title">Chips Ativos</div>
                 <div class="card-value" id="chipsAtivos">0</div>
-                <div class="card-subtitle">Conectados e operacionais</div>
+                <div class="card-details">
+                    <div class="card-detail-item">
+                        <div class="card-detail-label">Ligados</div>
+                        <div class="card-detail-value" id="chipsLigados">0</div>
+                    </div>
+                    <div class="card-detail-item">
+                        <div class="card-detail-label">Desconectados</div>
+                        <div class="card-detail-value" id="chipsDesconectados">0</div>
+                    </div>
+                </div>
             </div>
             <div class="card">
-                <div class="card-title">Business</div>
-                <div class="card-value" id="chipsBusiness">0</div>
-                <div class="card-subtitle">WhatsApp Business</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Restritos/Banidos</div>
+                <div class="card-title">Chips Restritos</div>
                 <div class="card-value" id="chipsRestritos">0</div>
                 <div class="card-subtitle">Requerem atenção</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chips Banidos</div>
+                <div class="card-value" id="chipsBanidos">0</div>
+                <div class="card-subtitle">Requerem ação</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chips em Maturação</div>
+                <div class="card-value" id="chipsMaturacao">0</div>
+                <div class="card-subtitle">Requer acompanhamento</div>
             </div>
         </div>
 
@@ -792,9 +866,13 @@
                     <input type="text" id="searchTelefone" placeholder="Digite o número..." onkeyup="aplicarFiltros()">
                 </div>
                 <div class="filter-group">
-                    <label for="filterMunicipio">Filtrar por Município</label>
+                    <label for="searchAparelho">Buscar por Aparelho</label>
+                    <input type="text" id="searchAparelho" placeholder="Digite o número e a UF..." onkeyup="aplicarFiltros()">
+                </div>
+                <div class="filter-group">
+                    <label for="filterMunicipio">Filtrar por Estado ou Município</label>
                     <select id="filterMunicipio" onchange="aplicarFiltros()">
-                        <option value="">Todos os Municípios</option>
+                        <option value="">Todos</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -809,16 +887,6 @@
                     <label for="filterEvo">Filtrar por EVO</label>
                     <select id="filterEvo" onchange="aplicarFiltros()">
                         <option value="">Todos os EVOs</option>
-                        <option value="EVO 1">EVO 1</option>
-                        <option value="EVO 2">EVO 2</option>
-                        <option value="EVO 3">EVO 3</option>
-                        <option value="EVO 4">EVO 4</option>
-                        <option value="EVO 5">EVO 5</option>
-                        <option value="EVO 6">EVO 6</option>
-                        <option value="EVO 7">EVO 7</option>
-                        <option value="EVO 8">EVO 8</option>
-                        <option value="EVO 9">EVO 9</option>
-                        <option value="EVO 10">EVO 10</option>
                     </select>
                 </div>
             </div>
@@ -829,7 +897,7 @@
 
         <div class="table-section">
             <div class="table-header">
-                <h2>📋 Registro de Chips por Município</h2>
+                <h2>📋 Registro de Chips por Estado e Município</h2>
                 <div class="export-buttons">
                     <button class="btn btn-warning" onclick="solicitarAutenticacao('novo')">➕ CADASTRAR NOVO</button>
                     <button class="btn btn-success" onclick="exportarPDF()">📄 Exportar PDF</button>
@@ -840,7 +908,7 @@
                 <table id="tabelaChips">
                     <thead>
                         <tr>
-                            <th class="sortable" onclick="ordenarTabela(0)">Município</th>
+                            <th class="sortable" onclick="ordenarTabela(0)">Projeto</th>
                             <th class="sortable" onclick="ordenarTabela(1)">Status</th>
                             <th class="sortable" onclick="ordenarTabela(2)">Telefone</th>
                             <th class="sortable" onclick="ordenarTabela(3)">EVO</th>
@@ -911,7 +979,7 @@
             <div class="modal-body">
                 <input type="hidden" id="editId">
                 <div class="form-group">
-                    <label for="editMunicipio">Município <span class="required">*</span></label>
+                    <label for="editMunicipio">Projeto <span class="required">*</span></label>
                     <select id="editMunicipio">
                         <option value="">Selecione...</option>
                         <option value="BOM JESUS">BOM JESUS</option>
@@ -948,25 +1016,13 @@
                 </div>
                 <div class="form-group">
                     <label for="editEvo">EVO <span class="required">*</span></label>
-                    <select id="editEvo">
-                        <option value="">Selecione...</option>
-                        <option value="EVO 1">EVO 1</option>
-                        <option value="EVO 2">EVO 2</option>
-                        <option value="EVO 3">EVO 3</option>
-                        <option value="EVO 4">EVO 4</option>
-                        <option value="EVO 5">EVO 5</option>
-                        <option value="EVO 6">EVO 6</option>
-                        <option value="EVO 7">EVO 7</option>
-                        <option value="EVO 8">EVO 8</option>
-                        <option value="EVO 9">EVO 9</option>
-                        <option value="EVO 10">EVO 10</option>
-                    </select>
-                    <div class="error-message" id="errorEvo">Campo obrigatório</div>
+                    <input type="text" id="editEvo" placeholder="Ex: EVO 01 - RJ">
+                    <div class="error-message" id="errorEvo">Campo obrigatório (formato: EVO número - UF)</div>
                 </div>
                 <div class="form-group">
                     <label for="editAparelho">Aparelho <span class="required">*</span></label>
-                    <input type="text" id="editAparelho" placeholder="Ex: 31">
-                    <div class="error-message" id="errorAparelho">Campo obrigatório</div>
+                    <input type="text" id="editAparelho" placeholder="Ex: 31 - RJ">
+                    <div class="error-message" id="errorAparelho">Campo obrigatório (formato: número - UF)</div>
                 </div>
                 <div class="form-group">
                     <label for="editSim">SIM <span class="required">*</span></label>
@@ -1009,6 +1065,32 @@
                 return { aparelho: partes[0], sim: partes[1].toUpperCase(), tipoWhatsApp: partes[2].toUpperCase() };
             }
             return { aparelho: '-', sim: '-', tipoWhatsApp: 'B' };
+        }
+
+        function formatarAparelho(aparelho) {
+            if (aparelho === '-') return '-';
+            const partes = aparelho.split('-').map(p => p.trim());
+            if (partes.length === 2) {
+                const numero = partes[0].padStart(2, '0');
+                return `${numero} - ${partes[1]}`;
+            }
+            return aparelho;
+        }
+
+        function formatarEvo(evo) {
+            if (!evo || evo === '-') return '-';
+            const match = evo.match(/EVO\s*(\d+)/i);
+            if (match) {
+                const numero = match[1].padStart(2, '0');
+                if (evo.includes('-')) {
+                    const partes = evo.split('-').map(p => p.trim());
+                    if (partes.length === 2) {
+                        return `EVO ${numero} - ${partes[1]}`;
+                    }
+                }
+                return `EVO ${numero} - RJ`;
+            }
+            return evo;
         }
 
         function obterDataAtual() {
@@ -1153,13 +1235,17 @@
         let proximoId = 1;
         const dadosChips = dadosChipsRaw.map(chip => {
             const parsed = parseStatusInfo(chip.statusInfo);
+            const aparelhoComUF = parsed.aparelho !== '-' ? `${parsed.aparelho} - RJ` : '-';
+            const aparelhoFormatado = formatarAparelho(aparelhoComUF);
+            const evoFormatado = formatarEvo(chip.evo);
             const historico = {};
             historico['2026-02-01'] = { cenario: chip.cenario, usuario: 'sistema' };
             return {
                 id: proximoId++,
                 ...chip,
                 status: "Ativo",
-                aparelho: parsed.aparelho,
+                evo: evoFormatado,
+                aparelho: aparelhoFormatado,
                 sim: parsed.sim,
                 tipoWhatsApp: parsed.tipoWhatsApp,
                 historicoCenarios: historico
@@ -1230,6 +1316,7 @@
 
         function inicializarDashboard() {
             popularFiltroMunicipios();
+            popularFiltroEvos();
             atualizarDashboardCards();
             aplicarFiltros();
         }
@@ -1238,11 +1325,28 @@
             const municipios = [...new Set(dadosChips.filter(c => c.status !== 'Cancelado').map(chip => chip.municipio))];
             const municipiosOrdenados = ordenarMunicipiosCustomizado(municipios);
             const select = document.getElementById('filterMunicipio');
-            select.innerHTML = '<option value="">Todos os Municípios</option>';
+            select.innerHTML = '<option value="">Todos</option>';
             municipiosOrdenados.forEach(municipio => {
                 const option = document.createElement('option');
                 option.value = municipio;
                 option.textContent = municipio;
+                select.appendChild(option);
+            });
+        }
+
+        function popularFiltroEvos() {
+            const evos = [...new Set(dadosChips.filter(c => c.status !== 'Cancelado').map(chip => chip.evo))];
+            const evosOrdenados = evos.sort((a, b) => {
+                const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+                const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+                return numA - numB;
+            });
+            const select = document.getElementById('filterEvo');
+            select.innerHTML = '<option value="">Todos os EVOs</option>';
+            evosOrdenados.forEach(evo => {
+                const option = document.createElement('option');
+                option.value = evo;
+                option.textContent = evo;
                 select.appendChild(option);
             });
         }
@@ -1254,16 +1358,23 @@
             document.getElementById('totalMunicipios').textContent = municipiosUnicos.length;
             const evosUnicos = [...new Set(chipsAtivos.map(chip => chip.evo))];
             document.getElementById('totalEvos').textContent = evosUnicos.length;
-            const chipsConectados = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('LIGADO')).length;
+            const chipsLigados = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('LIGADO')).length;
+            const chipsDesconectados = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('DESCONECTADO')).length;
+            const chipsConectados = chipsLigados + chipsDesconectados;
             document.getElementById('chipsAtivos').textContent = chipsConectados;
-            const chipsBusiness = chipsAtivos.filter(chip => chip.tipoWhatsApp === 'B').length;
-            document.getElementById('chipsBusiness').textContent = chipsBusiness;
-            const chipsRestritos = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('RESTRITO') || chip.cenario.toUpperCase().includes('BANIDO')).length;
+            document.getElementById('chipsLigados').textContent = chipsLigados;
+            document.getElementById('chipsDesconectados').textContent = chipsDesconectados;
+            const chipsRestritos = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('RESTRITO')).length;
             document.getElementById('chipsRestritos').textContent = chipsRestritos;
+            const chipsBanidos = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('BANIDO')).length;
+            document.getElementById('chipsBanidos').textContent = chipsBanidos;
+            const chipsMaturacao = chipsAtivos.filter(chip => chip.cenario.toUpperCase().includes('MATURAÇÃO') || chip.cenario.toUpperCase().includes('MATURADOR')).length;
+            document.getElementById('chipsMaturacao').textContent = chipsMaturacao;
         }
 
         function aplicarFiltros() {
             const buscaTelefone = document.getElementById('searchTelefone').value.toLowerCase();
+            const buscaAparelho = document.getElementById('searchAparelho').value.toLowerCase();
             const filtroMunicipio = document.getElementById('filterMunicipio').value;
             const filtroStatus = document.getElementById('filterStatus').value;
             const filtroEvo = document.getElementById('filterEvo').value;
@@ -1271,10 +1382,11 @@
             dadosFiltrados = dadosChips.filter(chip => {
                 if (chip.status === 'Cancelado') return false;
                 const matchTelefone = chip.telefone.toLowerCase().includes(buscaTelefone);
+                const matchAparelho = chip.aparelho.toLowerCase().includes(buscaAparelho);
                 const matchMunicipio = !filtroMunicipio || chip.municipio === filtroMunicipio;
                 const matchStatus = !filtroStatus || chip.status === filtroStatus;
                 const matchEvo = !filtroEvo || chip.evo === filtroEvo;
-                return matchTelefone && matchMunicipio && matchStatus && matchEvo;
+                return matchTelefone && matchAparelho && matchMunicipio && matchStatus && matchEvo;
             });
 
             dadosFiltrados = ordenarDadosPorMunicipio(dadosFiltrados);
@@ -1292,6 +1404,7 @@
 
         function limparFiltros() {
             document.getElementById('searchTelefone').value = '';
+            document.getElementById('searchAparelho').value = '';
             document.getElementById('filterMunicipio').value = '';
             document.getElementById('filterStatus').value = '';
             document.getElementById('filterEvo').value = '';
@@ -1499,7 +1612,7 @@
             const municipio = document.getElementById('editMunicipio').value.trim();
             const status = document.getElementById('editStatus').value;
             const telefone = document.getElementById('editTelefone').value.trim();
-            const evo = document.getElementById('editEvo').value;
+            const evo = document.getElementById('editEvo').value.trim();
             const aparelho = document.getElementById('editAparelho').value.trim();
             const sim = document.getElementById('editSim').value;
             const tipoWhatsApp = document.getElementById('editTipoWhatsApp').value;
@@ -1532,6 +1645,26 @@
                 return;
             }
 
+            const evoPattern = /^EVO\s+\d+\s*-\s*[A-Z]{2}$/i;
+            if (!evoPattern.test(evo)) {
+                document.getElementById('errorEvo').textContent = 'Formato inválido. Use: EVO número - UF (Ex: EVO 01 - RJ)';
+                document.getElementById('errorEvo').classList.add('active');
+                document.getElementById('editEvo').classList.add('error');
+                mostrarToast('Formato de EVO inválido!', true);
+                return;
+            }
+
+            const aparelhoPattern = /^\d+\s*-\s*[A-Z]{2}$/;
+            if (!aparelhoPattern.test(aparelho)) {
+                document.getElementById('errorAparelho').textContent = 'Formato inválido. Use: número - UF (Ex: 31 - RJ)';
+                document.getElementById('errorAparelho').classList.add('active');
+                document.getElementById('editAparelho').classList.add('error');
+                mostrarToast('Formato de Aparelho inválido!', true);
+                return;
+            }
+
+            const aparelhoFormatado = formatarAparelho(aparelho);
+            const evoFormatado = formatarEvo(evo);
             const chaveDataAtual = obterChaveDataAtual();
 
             if (id) {
@@ -1539,7 +1672,7 @@
                 if (index !== -1) {
                     dadosChips[index] = {
                         ...dadosChips[index],
-                        municipio, status, telefone, evo, aparelho, sim, tipoWhatsApp,
+                        municipio, status, telefone, evo: evoFormatado, aparelho: aparelhoFormatado, sim, tipoWhatsApp,
                         cenario: cenario || dadosChips[index].cenario
                     };
 
@@ -1559,6 +1692,7 @@
                             aplicarFiltros();
                             atualizarDashboardCards();
                             popularFiltroMunicipios();
+                            popularFiltroEvos();
                         }, 1000);
                         mostrarToast('Registro cancelado e removido com sucesso!');
                     } else {
@@ -1570,7 +1704,7 @@
                 historico[chaveDataAtual] = { cenario: cenario || 'Novo registro', usuario: usuarioLogado };
                 const novoRegistro = {
                     id: Math.max(...dadosChips.map(c => c.id)) + 1,
-                    municipio, status, telefone, evo, aparelho, sim, tipoWhatsApp,
+                    municipio, status, telefone, evo: evoFormatado, aparelho: aparelhoFormatado, sim, tipoWhatsApp,
                     cenario: cenario || 'Novo registro',
                     historicoCenarios: historico
                 };
@@ -1583,6 +1717,7 @@
             aplicarFiltros();
             atualizarDashboardCards();
             popularFiltroMunicipios();
+            popularFiltroEvos();
         }
 
         function abrirModal(id) {
@@ -1620,7 +1755,7 @@
 
                     doc.setFontSize(14);
                     doc.setTextColor(0, 0, 0);
-                    doc.text('Controle de Chips e APIs', 15, 23);
+                    doc.text('Controle de Aparelhos, Chips e APIs', 15, 23);
 
                     doc.setFontSize(10);
                     doc.setTextColor(100, 100, 100);
@@ -1630,7 +1765,7 @@
                     doc.setDrawColor(226, 232, 240);
                     doc.line(15, 38, 282, 38);
 
-                    const headers = [['Município', 'Status', 'Telefone', 'EVO', 'Aparelho', 'SIM', 'Tipo WhatsApp', `Cenário ${dataAtualFormatada}`]];
+                    const headers = [['Projeto', 'Status', 'Telefone', 'EVO', 'Aparelho', 'SIM', 'Tipo WhatsApp', `Cenário ${dataAtualFormatada}`]];
                     const dados = dadosFiltrados.map(chip => [
                         chip.municipio, chip.status, chip.telefone, chip.evo, chip.aparelho, chip.sim,
                         chip.tipoWhatsApp === 'B' ? 'Business' : 'Messenger',
@@ -1678,7 +1813,7 @@
 
                     const dadosExport = dadosFiltrados.map(chip => {
                         const linha = {
-                            'Município': chip.municipio,
+                            'Projeto': chip.municipio,
                             'Status': chip.status,
                             'Telefone': chip.telefone,
                             'EVO': chip.evo,
