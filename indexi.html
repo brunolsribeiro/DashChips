@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Serviço de Mensageria - Controle de Chips</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-bg: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.3s ease;
+        }
+
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .last-edit {
+            font-size: 12px;
+            opacity: 0.85;
+            font-style: italic;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .card-details {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card-detail-item {
+            flex: 1;
+            background: var(--light-bg);
+            padding: 6px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .card-detail-label {
+            font-size: 9px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 3px;
+        }
+
+        .card-detail-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .filters-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filters-header h2 {
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .table-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header h2 {
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--light-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px 10px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: var(--border-color);
+        }
+
+        th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.5;
+        }
+
+        th.sorted-asc::after {
+            content: ' ↑';
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        th.sorted-desc::after {
+            content: ' ↓';
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        td {
+            padding: 15px 10px;
+            font-size: 13px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: var(--light-bg);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-business {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-messenger {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .badge-s1 {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-s2 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-ativo {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-inativo {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-cancelado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .municipio-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+
+        .pagination {
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination-select {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .pagination-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pagination-buttons button {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .pagination-buttons button:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group label .required {
+            color: var(--danger-color);
+            margin-left: 2px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group input.error,
+        .form-group select.error,
+        .form-group textarea.error {
+            border-color: var(--danger-color);
+        }
+
+        .error-message {
+            display: none;
+            color: var(--danger-color);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error {
+            background: var(--danger-color);
+        }
+
+        .toast.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .header-right {
+                align-items: center;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .export-buttons button {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 10px 5px;
+                font-size: 11px;
+            }
+
+            .modal {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .pagination-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .card-details {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🚀 Dashboard Serviço de Mensageria</h1>
+                <p>Controle de Aparelhos, Chips e APIs</p>
+            </div>
+            <div class="header-right">
+                <div class="last-edit" id="lastEdit">Última edição em -- por --</div>
+                <button class="theme-toggle" onclick="toggleTheme()">🌓 Alternar Tema</button>
+            </div>
+        </div>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-title">Total de Chips</div>
+                <div class="card-value" id="totalChips">0</div>
+                <div class="card-subtitle">Registrados no sistema</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Clientes Atendidos</div>
+                <div class="card-value" id="totalMunicipios">0</div>
+                <div class="card-subtitle">Projetos com cobertura</div>
+            </div>
+            <div class="card">
+                <div class="card-title">EVOs Ativos</div>
+                <div class="card-value" id="totalEvos">0</div>
+                <div class="card-subtitle">Servidores</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chips Ativos</div>
+                <div class="card-value" id="chipsAtivos">0</div>
+                <div class="card-details">
+                    <div class="card-detail-item">
+                        <div class="card-detail-label">Ligados</div>
+                        <div class="card-detail-value" id="chipsLigados">0</div>
+                    </div>
+                    <div class="card-detail-item">
+                        <div class="card-detail-label">Desconectados</div>
+                        <div class="card-detail-value" id="chipsDesconectados">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chips Restritos</div>
+                <div class="card-value" id="chipsRestritos">0</div>
+                <div class="card-subtitle">Requerem atenção</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chips Banidos</div>
+                <div class="card-value" id="chipsBanidos">0</div>
+                <div class="card-subtitle">Requerem ação</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chips em Maturação</div>
+                <div class="card-value" id="chipsMaturacao">0</div>
+                <div class="card-subtitle">Requer acompanhamento</div>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-header">
+                <h2>🔍 Filtros e Busca</h2>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="searchTelefone">Buscar por Telefone</label>
+                    <input type="text" id="searchTelefone" placeholder="Digite o número..." onkeyup="aplicarFiltros()">
+                </div>
+                <div class="filter-group">
+                    <label for="searchAparelho">Buscar por Aparelho</label>
+                    <input type="text" id="searchAparelho" placeholder="Digite o número e a UF..." onkeyup="aplicarFiltros()">
+                </div>
+                <div class="filter-group">
+                    <label for="filterMunicipio">Filtrar por Estado ou Município</label>
+                    <select id="filterMunicipio" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterStatus">Filtrar por Status</label>
+                    <select id="filterStatus" onchange="aplicarFiltros()">
+                        <option value="">Todos os Status</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterEvo">Filtrar por EVO</label>
+                    <select id="filterEvo" onchange="aplicarFiltros()">
+                        <option value="">Todos os EVOs</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="limparFiltros()">🔄 Limpar Filtros</button>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <div class="table-header">
+                <h2>📋 Registro de Chips por Estado e Município</h2>
+                <div class="export-buttons">
+                    <button class="btn btn-warning" onclick="solicitarAutenticacao('novo')">➕ CADASTRAR NOVO</button>
+                    <button class="btn btn-success" onclick="exportarPDF()">📄 Exportar PDF</button>
+                    <button class="btn btn-primary" onclick="exportarExcel()">📊 Exportar Excel</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="tabelaChips">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="ordenarTabela(0)">Projeto</th>
+                            <th class="sortable" onclick="ordenarTabela(1)">Status</th>
+                            <th class="sortable" onclick="ordenarTabela(2)">Telefone</th>
+                            <th class="sortable" onclick="ordenarTabela(3)">EVO</th>
+                            <th class="sortable" onclick="ordenarTabela(4)">Aparelho</th>
+                            <th class="sortable" onclick="ordenarTabela(5)">SIM</th>
+                            <th class="sortable" onclick="ordenarTabela(6)">Tipo WhatsApp</th>
+                            <th class="sortable" onclick="ordenarTabela(7)" id="headerCenario">Cenário 06/02/2026</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBody">
+                        <tr>
+                            <td colspan="9" class="loading">Carregando dados...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <div class="pagination-info">
+                    <span id="paginationInfo">Mostrando 0 de 0 registros</span>
+                    <select class="pagination-select" id="itensPorPaginaSelect" onchange="mudarItensPorPagina()">
+                        <option value="25">25 por página</option>
+                        <option value="50">50 por página</option>
+                        <option value="100">100 por página</option>
+                    </select>
+                </div>
+                <div class="pagination-buttons">
+                    <button onclick="mudarPagina(-1)" id="btnAnterior">← Anterior</button>
+                    <button onclick="mudarPagina(1)" id="btnProxima">Próxima →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="modal-overlay" id="modalAuth">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔐 Autenticação Necessária</h3>
+                <button class="modal-close" onclick="fecharModal('modalAuth')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="authLogin">Login <span class="required">*</span></label>
+                    <input type="text" id="authLogin" placeholder="nome.sobrenome">
+                    <div class="error-message" id="errorLogin">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="authSenha">Senha <span class="required">*</span></label>
+                    <input type="password" id="authSenha" placeholder="Digite sua senha">
+                    <div class="error-message" id="errorSenha">Campo obrigatório</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalAuth')">Cancelar</button>
+                <button class="btn btn-primary" onclick="validarAutenticacao()">Acessar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalEdit">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalEditTitle">Editar Registro</h3>
+                <button class="modal-close" onclick="fecharModal('modalEdit')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editMunicipio">Projeto <span class="required">*</span></label>
+                    <input type="text" id="editMunicipio" placeholder="Digite o nome do projeto...">
+                    <div class="error-message" id="errorMunicipio">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Status <span class="required">*</span></label>
+                    <select id="editStatus">
+                        <option value="">Selecione...</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                    <div class="error-message" id="errorStatus">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editTelefone">Telefone <span class="required">*</span></label>
+                    <input type="tel" id="editTelefone" placeholder="(XX) XXXXX-XXXX">
+                    <div class="error-message" id="errorTelefone">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editEvo">EVO <span class="required">*</span></label>
+                    <input type="text" id="editEvo" placeholder="Ex: EVO 01 - RJ, MATURADOR I (13.26) ou WPP CONNECT">
+                    <div class="error-message" id="errorEvo">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editAparelho">Aparelho <span class="required">*</span></label>
+                    <input type="text" id="editAparelho" placeholder="Ex: 31 - RJ, 31 - PA ou apenas número">
+                    <div class="error-message" id="errorAparelho">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editSim">SIM <span class="required">*</span></label>
+                    <select id="editSim">
+                        <option value="">Selecione...</option>
+                        <option value="S1">S1</option>
+                        <option value="S2">S2</option>
+                    </select>
+                    <div class="error-message" id="errorSim">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editTipoWhatsApp">Tipo WhatsApp <span class="required">*</span></label>
+                    <select id="editTipoWhatsApp">
+                        <option value="">Selecione...</option>
+                        <option value="B">Business</option>
+                        <option value="M">Messenger</option>
+                    </select>
+                    <div class="error-message" id="errorTipoWhatsApp">Campo obrigatório</div>
+                </div>
+                <div class="form-group">
+                    <label for="editCenario">Observações do Cenário</label>
+                    <textarea id="editCenario" placeholder="Ex: Desconectado, Ligado, etc..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('modalEdit')">Cancelar</button>
+                <button class="btn btn-success" onclick="salvarRegistro()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        const dadosChipsRaw = [
+            {municipio: "BOM JESUS", telefone: "(22) 99216-7244", evo: "EVO 02 - RJ", aparelho: "40", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "BOM JESUS", telefone: "(22) 99227-1210", evo: "EVO 04 - RJ", aparelho: "40", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "BOM JESUS", telefone: "(22) 99228-0897", evo: "EVO 03 - RJ", aparelho: "37", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "BOM JESUS", telefone: "(22) 99284-5352", evo: "EVO 01 - RJ", aparelho: "8", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "BÚZIOS", telefone: "(22) 99262-6681", evo: "EVO 03 - RJ", aparelho: "54", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "BÚZIOS", telefone: "(22) 99284-5821", evo: "WPP CONNECT", aparelho: "47", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "BÚZIOS", telefone: "(22) 99276-3144", evo: "WPP CONNECT", aparelho: "03", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "BÚZIOS", telefone: "(22) 99287-8198", evo: "WPP CONNECT", aparelho: "21", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "BÚZIOS", telefone: "(22) 99269-1121", evo: "EVO 03 - RJ", aparelho: "54", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "BÚZIOS", telefone: "(22) 99258-0633", evo: "EVO 02 - RJ", aparelho: "01", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "CABO FRIO", telefone: "(22) 99212-9901", evo: "", aparelho: "18", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "CABO FRIO", telefone: "(22) 99274-8469", evo: "EVO 03 - RJ", aparelho: "52", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99222-2996", evo: "EVO 01 - RJ", aparelho: "49", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99204-5196", evo: "EVO 06 - RJ", aparelho: "49", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "CABO FRIO", telefone: "(22) 99262-1125", evo: "", aparelho: "27", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "CABO FRIO", telefone: "(22) 99209-8067", evo: "", aparelho: "13", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "CABO FRIO", telefone: "(22) 99269-1822", evo: "EVO 02 - RJ", aparelho: "52", sim: "S2", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99282-0756", evo: "EVO 08 - RJ", aparelho: "58", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99279-5130", evo: "MATURADOR II (231.26)", aparelho: "25", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99244-8833", evo: "MATURADOR II (231.26)", aparelho: "25", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "CABO FRIO", telefone: "(22) 99235-1906", evo: "EVO 04 - RJ", aparelho: "27", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "CABO FRIO", telefone: "(22) 99279-9929", evo: "EVO 01 - RJ", aparelho: "28", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "CARAPEBUS", telefone: "(22) 99204-3695", evo: "EVO 02 - RJ", aparelho: "41", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "CARAPEBUS", telefone: "(22) 99101-7919", evo: "", aparelho: "53", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "CARAPEBUS", telefone: "(22) 99219-1966", evo: "EVO 06 - RJ", aparelho: "38", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "ITAPERUNA", telefone: "(22) 99272-3912", evo: "EVO 05 - RJ", aparelho: "36", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99283-0080", evo: "EVO 06 - RJ", aparelho: "37", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "ITAPERUNA", telefone: "(22) 99258-2894", evo: "EVO 01 - RJ", aparelho: "10", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "ITAPERUNA", telefone: "(22) 99264-4879", evo: "EVO 01 - RJ", aparelho: "24", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99275-5611", evo: "MATURADOR II (231.26)", aparelho: "58", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "ITAPERUNA", telefone: "(22) 99202-5409", evo: "EVO 06 - RJ", aparelho: "33", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "ITAPERUNA", telefone: "(22) 99204-5081", evo: "", aparelho: "24", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "ITAPERUNA", telefone: "(22) 99264-0012", evo: "EVO 08 - RJ", aparelho: "10", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "ITAPERUNA", telefone: "(22) 99246-1625", evo: "EVO 02 - RJ", aparelho: "11", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "ITAPERUNA", telefone: "(22) 99282-7675", evo: "EVO 02 - RJ", aparelho: "11", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MENDES", telefone: "(24) 99325-7568", evo: "EVO 07 - RJ", aparelho: "50", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MENDES", telefone: "(24) 99295-9608", evo: "EVO 02 - RJ", aparelho: "4", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MENDES", telefone: "(24) 99219-9008", evo: "EVO 04 - RJ", aparelho: "36", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96610-0141", evo: "EVO 07 - RJ", aparelho: "28", sim: "S2", tipoWhatsApp: "M", cenario: "DESCONECTADO"},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97528-0814", evo: "EVO 04 - RJ", aparelho: "23", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97323-1783", evo: "WPP CONNECT", aparelho: "23", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96680-3107", evo: "WPP CONNECT", aparelho: "45", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97528-3280", evo: "EVO 08 - RJ", aparelho: "22", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97528-2187", evo: "EVO 07 - RJ", aparelho: "22", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 97534-4074", evo: "EVO 05 - RJ", aparelho: "0", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96643-6968", evo: "WPP CONNECT", aparelho: "55", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96670-0429", evo: "WPP CONNECT", aparelho: "5", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96670-3619", evo: "MATURAR", aparelho: "60", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "NOVA IGUAÇU", telefone: "(21) 96670-5926", evo: "EVO 02 - RJ", aparelho: "60", sim: "S1", tipoWhatsApp: "M", cenario: "DESCONECTADO"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99313-2203", evo: "EVO 05 - RJ", aparelho: "31", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99208-3402", evo: "EVO 04 - RJ", aparelho: "26", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99251-6827", evo: "EVO 08 - RJ", aparelho: "6", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99395-9978", evo: "EVO 05 - RJ", aparelho: "42", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99224-0701", evo: "EVO 08 - RJ", aparelho: "29", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99325-9941", evo: "EVO 06 - RJ", aparelho: "48", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99254-7442", evo: "EVO 01 - RJ", aparelho: "39", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99205-1841", evo: "EVO 07 - RJ", aparelho: "39", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99213-8272", evo: "EVO 07 - RJ", aparelho: "34", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99252-9244", evo: "EVO 07 - RJ", aparelho: "59", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99209-5761", evo: "MATURADOR I (13.26)", aparelho: "45", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99212-6359", evo: "", aparelho: "13", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99220-8595", evo: "EVO 05 - RJ", aparelho: "46", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99267-9741", evo: "EVO 07 - RJ", aparelho: "50", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99204-2451", evo: "EVO 07 - RJ", aparelho: "38", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99298-1621", evo: "EVO 02 - RJ", aparelho: "02", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PETRÓPOLIS", telefone: "(24) 99278-0105", evo: "EVO 02 - RJ", aparelho: "02", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RESENDE", telefone: "(24) 99222-7704", evo: "EVO 03 - RJ", aparelho: "17", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "RESENDE", telefone: "(24) 99267-1241", evo: "EVO 01 - RJ", aparelho: "16", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "RESENDE", telefone: "(24) 99275-8265", evo: "EVO 03 - RJ", aparelho: "7", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "RESENDE", telefone: "(24) 99246-8702", evo: "EVO 03 - RJ", aparelho: "17", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "RESENDE", telefone: "(24) 99206-9897", evo: "", aparelho: "9", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "RESENDE", telefone: "(24) 99206-2069", evo: "EVO 05 - RJ", aparelho: "14", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "RESENDE", telefone: "(24) 99220-0395", evo: "EVO 07 - RJ", aparelho: "31", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "RESENDE", telefone: "(24) 99295-1227", evo: "EVO 02 - RJ", aparelho: "44", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "RIO BONITO", telefone: "(21) 97275-6537", evo: "EVO 07 - RJ", aparelho: "59", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99528-7286", evo: "EVO 08 - RJ", aparelho: "61", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99059-2635", evo: "EVO 06 - RJ", aparelho: "62", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 97452-8824", evo: "EVO 06 - RJ", aparelho: "12", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99362-7984", evo: "EVO 01 - RJ", aparelho: "01", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99985-8968", evo: "", aparelho: "57", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 96753-5600", evo: "", aparelho: "57", sim: "S2", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 96671-8985", evo: "EVO 02 - RJ", aparelho: "47", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99493-0754", evo: "EVO 02 - RJ", aparelho: "43", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99343-5780", evo: "MATURADOR I (13.26)", aparelho: "56", sim: "S2", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99475-0643", evo: "MATURADOR I (13.26)", aparelho: "56", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "RIO BONITO", telefone: "(21) 99679-7160", evo: "", aparelho: "61", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "RIO BONITO", telefone: "(21) 99396-4497", evo: "EVO 02 - RJ", aparelho: "44", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "SAPUCAIA", telefone: "(24) 99227-6230", evo: "", aparelho: "26", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "SAPUCAIA", telefone: "(24) 99201-6293", evo: "MATURADOR I (13.26)", aparelho: "34", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "SAPUCAIA", telefone: "(24) 99251-5143", evo: "MATURADOR I (13.26)", aparelho: "7", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "SAPUCAIA", telefone: "(24) 99267-4699", evo: "MATURADOR II (231.26)", aparelho: "42", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "SAPUCAIA", telefone: "(24) 99277-9640", evo: "", aparelho: "43", sim: "S1", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "SAPUCAIA", telefone: "(24) 99221-7703", evo: "", aparelho: "33", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "SAPUCAIA", telefone: "(21) 96679-0301", evo: "", aparelho: "20", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 99401-2750", evo: "EVO 02 - RJ", aparelho: "35", sim: "S1", tipoWhatsApp: "B", cenario: "Ligado"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 97433-0969", evo: "EVO 05 - RJ", aparelho: "48", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 96614-6177", evo: "EVO 08 - RJ", aparelho: "29", sim: "S1", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 97530-2966", evo: "EVO 07 - RJ", aparelho: "35", sim: "S2", tipoWhatsApp: "M", cenario: "Ligado"},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 96672-3471", evo: "MATURADOR I (13.26)", aparelho: "19", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 99292-8839", evo: "EVO 03 - RJ", aparelho: "19", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "SÃO JOÃO DE MERITI", telefone: "(21) 96867-1756", evo: "EVO 05 - RJ", aparelho: "55", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(21) 98604-4133", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(22) 99245-4049", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(22) 99276-9948", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "HOMOLOGAÇÃO", telefone: "(22) 99233-7566", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99242-8766", evo: "", aparelho: "14", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99243-4584", evo: "MATURADOR I (13.26)", aparelho: "41", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 99057-6135", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 99102-0546", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 96728-7401", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99282-3777", evo: "MATURADOR I (13.26)", aparelho: "08", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 99740-5631", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 97289-6416", evo: "", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99281-3284", evo: "MATURADOR I (13.26)", aparelho: "", sim: "", tipoWhatsApp: "", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 96670-4761", evo: "MATURADOR II (231.26)", aparelho: "62", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99224-7789", evo: "MATURADOR II (231.26)", aparelho: "09", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99278-2153", evo: "EVO 06 - RJ", aparelho: "21", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 97625-3963", evo: "EVO 02 - RJ", aparelho: "16", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99269-1121", evo: "EVO 03 - RJ", aparelho: "54", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99206-1557", evo: "MATURADOR I (13.26)", aparelho: "32", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 97324-7308", evo: "MATURADOR I (13.26)", aparelho: "53", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99236-2939", evo: "MATURADOR I (13.26)", aparelho: "12", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99246-0545", evo: "", aparelho: "04", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(21) 96694-2273", evo: "", aparelho: "18", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99248-3296", evo: "", aparelho: "46", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(22) 99282-1077", evo: "", aparelho: "03", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "MATURAÇÃO", telefone: "(24) 99209-5899", evo: "", aparelho: "06", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98492-5582", evo: "EVO 01 - PA", aparelho: "01 - PA", sim: "S2", tipoWhatsApp: "", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98634-5058", evo: "", aparelho: "02 - PA", sim: "S1", tipoWhatsApp: "", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98491-4106", evo: "EVO 01 - PA", aparelho: "02 - PA", sim: "S2", tipoWhatsApp: "", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98630-9412", evo: "", aparelho: "03 - PA", sim: "S1", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98478-7321", evo: "EVO 01 - PA", aparelho: "03 - PA", sim: "S2", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98634-4432", evo: "", aparelho: "04 - PA", sim: "S1", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98633-1489", evo: "", aparelho: "04 - PA", sim: "S2", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98480-6234", evo: "EVO 01 - PA", aparelho: "05 - PA", sim: "S1", tipoWhatsApp: "", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98478-2921", evo: "EVO 01 - PA", aparelho: "05 - PA", sim: "S2", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98490-1898", evo: "EVO 01 - PA", aparelho: "06 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98631-2644", evo: "", aparelho: "06 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98493-3195", evo: "EVO 02 - PA", aparelho: "07 - PA", sim: "S1", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98634-3568", evo: "EVO 01 - PA", aparelho: "07 - PA", sim: "S2", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98480-4524", evo: "EVO 03 - PA", aparelho: "08 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98490-7635", evo: "EVO 04 - PA", aparelho: "08 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98481-1119", evo: "EVO 01 - PA", aparelho: "09 - PA", sim: "S1", tipoWhatsApp: "", cenario: "DESCONECTADO"},
+            {municipio: "PARÁ", telefone: "(91) 98634-6685", evo: "EVO 01 - PA", aparelho: "09 - PA", sim: "S2", tipoWhatsApp: "", cenario: "COLOCAR MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98582-0762", evo: "EVO 01 - PA", aparelho: "10 - PA", sim: "S1", tipoWhatsApp: "", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98483-0180", evo: "EVO 01 - PA", aparelho: "10 - PA", sim: "S2", tipoWhatsApp: "", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98630-1909", evo: "", aparelho: "11 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98409-5200", evo: "EVO 02 - PA", aparelho: "11 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "DESCONECTADO"},
+            {municipio: "PARÁ", telefone: "(91) 98634-4749", evo: "", aparelho: "12 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98417-8058", evo: "", aparelho: "12 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98426-8890", evo: "EVO 01 - PA", aparelho: "13 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "BANIDO"},
+            {municipio: "PARÁ", telefone: "(91) 98425-5632", evo: "", aparelho: "13 - PA", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98508-6366", evo: "EVO 01 - PA", aparelho: "14 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "BANIDO"},
+            {municipio: "PARÁ", telefone: "(91) 98425-0655", evo: "EVO 01 - PA", aparelho: "14 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98412-3293", evo: "EVO 01 - PA", aparelho: "15 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98631-2734", evo: "", aparelho: "16 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98498-7286", evo: "EVO 02 - PA", aparelho: "16 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98634-3473", evo: "", aparelho: "17 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98426-7082", evo: "EVO 03 - PA", aparelho: "17 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98426-9832", evo: "", aparelho: "18 - PA", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98406-5376", evo: "EVO 02 - PA", aparelho: "18 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "BANIDO"},
+            {municipio: "PARÁ", telefone: "(91) 98634-5573", evo: "", aparelho: "19 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98620-5497", evo: "", aparelho: "19 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98634-0406", evo: "", aparelho: "20 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Colocar Maturador"},
+            {municipio: "PARÁ", telefone: "(91) 98449-0920", evo: "", aparelho: "20 - PA", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98630-0426", evo: "", aparelho: "21 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98478-2702", evo: "EVO 02 - PA", aparelho: "21 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98631-3042", evo: "EVO 02 - PA", aparelho: "22 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "DESCONECTADO"},
+            {municipio: "PARÁ", telefone: "(91) 98456-5341", evo: "", aparelho: "22 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98404-9741", evo: "EVO 02 - PA", aparelho: "23 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98825-0735", evo: "", aparelho: "23 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98496-3341", evo: "", aparelho: "24 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98406-8324", evo: "", aparelho: "24 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98499-2451", evo: "", aparelho: "25 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98897-1488", evo: "EVO 02 - PA", aparelho: "25 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98893-8885", evo: "", aparelho: "26 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98511-0702", evo: "", aparelho: "26 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 99615-9765", evo: "", aparelho: "27 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98440-1883", evo: "EVO 03 - PA", aparelho: "27 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98511-0832", evo: "", aparelho: "28 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98402-5319", evo: "EVO 02 - PA", aparelho: "28 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98404-0266", evo: "", aparelho: "29 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98509-7285", evo: "", aparelho: "29 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98512-8713", evo: "EVO 02 - PA", aparelho: "30 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 99615-0780", evo: "EVO 02 - PA", aparelho: "30 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98440-1317", evo: "", aparelho: "31 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98426-6292", evo: "EVO 04 - PA", aparelho: "31 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98431-8465", evo: "", aparelho: "32 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98822-8542", evo: "", aparelho: "32 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR MANUAL"},
+            {municipio: "PARÁ", telefone: "(91) 98429-4045", evo: "", aparelho: "33 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "ENTENDER"},
+            {municipio: "PARÁ", telefone: "(91) 98408-1729", evo: "EVO 04 - PA", aparelho: "33 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98825-9226", evo: "", aparelho: "34 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98452-9285", evo: "", aparelho: "34 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98634-4441", evo: "", aparelho: "35 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98633-1713", evo: "", aparelho: "35 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "colocar contato"},
+            {municipio: "PARÁ", telefone: "(91) 98633-1538", evo: "", aparelho: "36 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98431-7905", evo: "EVO 04 - PA", aparelho: "36 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98406-6463", evo: "", aparelho: "37 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98418-5285", evo: "EVO 03 - PA", aparelho: "37 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98429-2985", evo: "", aparelho: "38 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98429-5355", evo: "EVO 03 - PA", aparelho: "38 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98631-7144", evo: "", aparelho: "39 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "COLOCAR MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98633-5492", evo: "", aparelho: "39 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "COLOCAR MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98449-7830", evo: "", aparelho: "40 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "Solicitada troca"},
+            {municipio: "PARÁ", telefone: "(91) 98479-5575", evo: "EVO 03 - PA", aparelho: "40 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98630-3051", evo: "", aparelho: "41 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98449-6675", evo: "EVO 01 - PA", aparelho: "41 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98510-0074", evo: "", aparelho: "42 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98508-5181", evo: "EVO 04 - PA", aparelho: "42 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98408-9451", evo: "EVO 03 - PA", aparelho: "43 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98411-8337", evo: "EVO 03 - PA", aparelho: "43 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 99629-7746", evo: "", aparelho: "44 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 97400-9664", evo: "", aparelho: "44 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 99987-0122", evo: "", aparelho: "45 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "DESCONECTADO"},
+            {municipio: "PARÁ", telefone: "(91) 98403-0448", evo: "EVO 02 - PA", aparelho: "45 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "BANIDO"},
+            {municipio: "PARÁ", telefone: "(91) 98453-5961", evo: "", aparelho: "46 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98545-8656", evo: "", aparelho: "46 - PA", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98431-8664", evo: "", aparelho: "47 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98429-6927", evo: "EVO 03 - PA", aparelho: "47 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98404-7130", evo: "EVO 03 - PA", aparelho: "48 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "DESCONECTADO"},
+            {municipio: "PARÁ", telefone: "(91) 98403-2560", evo: "EVO 03 - PA", aparelho: "48 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "BANIDO"},
+            {municipio: "PARÁ", telefone: "(91) 98456-0491", evo: "", aparelho: "49 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98477-7038", evo: "EVO 04 - PA", aparelho: "49 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98402-7555", evo: "", aparelho: "50 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98477-9594", evo: "", aparelho: "50 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98402-3274", evo: "", aparelho: "51 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98512-6681", evo: "", aparelho: "51 - PA", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98404-2469", evo: "", aparelho: "52 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98513-6424", evo: "", aparelho: "52 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98581-6698", evo: "EVO 04 - PA", aparelho: "53 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98426-2025", evo: "EVO 04 - PA", aparelho: "53 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 97400-7961", evo: "", aparelho: "54 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98479-9266", evo: "EVO 03 - PA", aparelho: "54 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98406-2996", evo: "EVO 04 - PA", aparelho: "55 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98407-9231", evo: "EVO 04 - PA", aparelho: "55 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98568-7427", evo: "", aparelho: "56 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "MATURADOR"},
+            {municipio: "PARÁ", telefone: "(91) 98497-6743", evo: "EVO 01 - PA", aparelho: "56 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98414-4923", evo: "", aparelho: "57 - PA", sim: "S1", tipoWhatsApp: "M", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98456-2033", evo: "", aparelho: "57 - PA", sim: "S2", tipoWhatsApp: "B", cenario: ""},
+            {municipio: "PARÁ", telefone: "(91) 98839-2376", evo: "EVO 04 - PA", aparelho: "58 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98408-2891", evo: "EVO 04 - PA", aparelho: "58 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98743-1415", evo: "EVO 04 - PA", aparelho: "59 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "BANIDO"},
+            {municipio: "PARÁ", telefone: "(91) 98413-6945", evo: "EVO 04 - PA", aparelho: "59 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "BANIDO"},
+            {municipio: "PARÁ", telefone: "(91) 98413-0807", evo: "EVO 04 - PA", aparelho: "60 - PA", sim: "S1", tipoWhatsApp: "M", cenario: "DESCONECTADO"},
+            {municipio: "PARÁ", telefone: "(91) 988693482", evo: "EVO 04 - PA", aparelho: "60 - PA", sim: "S2", tipoWhatsApp: "B", cenario: "LIGADO"},
+            {municipio: "PARÁ", telefone: "(91) 98429-0391", evo: "EVO 01 - PA", aparelho: "", sim: "", tipoWhatsApp: "", cenario: "LIGADO"}
+        ];
+
+        function detectarEstadoPorTelefone(telefone) {
+            if (telefone.includes('(91)') || telefone.includes('(93)') || telefone.includes('(94)')) {
+                return 'PA';
+            }
+            return 'RJ';
+        }
+
+        function formatarAparelho(aparelho, uf) {
+            if (!aparelho || aparelho === '' || aparelho === '-') return '-';
+            if (aparelho.includes(' - PA') || aparelho.includes(' - RJ')) return aparelho;
+            const numeroLimpo = String(aparelho).replace(/\s*PA\s*$/i, '').replace(/\s*RJ\s*$/i, '').trim();
+            if (numeroLimpo === '' || numeroLimpo === '0') return '-';
+            const numero = numeroLimpo.padStart(2, '0');
+            return `${numero} - ${uf}`;
+        }
+
+        function formatarEvo(evo) {
+            if (!evo || evo === '' || evo === '-') return '-';
+            return evo;
+        }
+
+        function normalizarTipoWhatsApp(tipo) {
+            if (!tipo || tipo === '') return '-';
+            return tipo.toUpperCase();
+        }
+
+        function normalizarSim(sim) {
+            if (!sim || sim === '') return '-';
+            return sim.toUpperCase();
+        }
+
+        function normalizarCenario(cenario) {
+            if (!cenario || cenario === '') return 'Desconectado';
+            return cenario;
+        }
+
+        function obterDataAtual() {
+            const hoje = new Date();
+            return hoje.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function obterChaveDataAtual() {
+            const hoje = new Date();
+            return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+        }
+
+        function salvarDadosNoLocalStorage() {
+            try {
+                localStorage.setItem('dadosChips', JSON.stringify(dadosChips));
+            } catch (error) {
+                console.error('Erro ao salvar dados no localStorage:', error);
+            }
+        }
+
+        function carregarDadosDoLocalStorage() {
+            try {
+                const dadosSalvos = localStorage.getItem('dadosChips');
+                if (dadosSalvos) {
+                    return JSON.parse(dadosSalvos);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados do localStorage:', error);
+            }
+            return null;
+        }
+
+        function inicializarDadosChips() {
+            const dadosSalvos = carregarDadosDoLocalStorage();
+            if (dadosSalvos && dadosSalvos.length > 0) {
+                return dadosSalvos;
+            }
+
+            let proximoId = 1;
+            return dadosChipsRaw.map(chip => {
+                const estado = detectarEstadoPorTelefone(chip.telefone);
+                let aparelhoFinal = chip.aparelho;
+                if (!chip.aparelho.includes(' - PA') && !chip.aparelho.includes(' - RJ') && chip.aparelho !== '' && chip.aparelho !== '0') {
+                    aparelhoFinal = formatarAparelho(chip.aparelho, estado);
+                } else if (chip.aparelho.includes(' - PA') || chip.aparelho.includes(' - RJ')) {
+                    aparelhoFinal = chip.aparelho;
+                } else {
+                    aparelhoFinal = '-';
+                }
+                const evoFormatado = formatarEvo(chip.evo);
+                const simFormatado = normalizarSim(chip.sim);
+                const tipoWhatsAppFormatado = normalizarTipoWhatsApp(chip.tipoWhatsApp);
+                const cenarioFormatado = normalizarCenario(chip.cenario);
+                const historico = {};
+                historico['2026-02-06'] = { cenario: cenarioFormatado, usuario: 'sistema' };
+                return {
+                    id: proximoId++,
+                    municipio: chip.municipio,
+                    telefone: chip.telefone,
+                    status: "Ativo",
+                    evo: evoFormatado,
+                    aparelho: aparelhoFinal,
+                    sim: simFormatado,
+                    tipoWhatsApp: tipoWhatsAppFormatado,
+                    cenario: cenarioFormatado,
+                    historicoCenarios: historico
+                };
+            });
+        }
+
+        let dadosChips = inicializarDadosChips();
+        let dadosFiltrados = [...dadosChips];
+        let paginaAtual = 1;
+        let itensPorPagina = 25;
+        let colunaOrdenacao = null;
+        let direcaoOrdenacao = 'asc';
+        let modoEdicao = 'novo';
+        let registroEditando = null;
+        let usuarioLogado = '';
+        const credenciais = { senha: 'mensageria' };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarUltimaEdicao();
+            atualizarTituloCenario();
+            inicializarDashboard();
+        });
+
+        function carregarUltimaEdicao() {
+            const ultimaEdicao = localStorage.getItem('ultimaEdicao');
+            if (ultimaEdicao) {
+                const dados = JSON.parse(ultimaEdicao);
+                const dataFormatada = new Date(dados.timestamp).toLocaleString('pt-BR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }).replace(',', ' às');
+                document.getElementById('lastEdit').textContent = `Última edição em ${dataFormatada} por ${dados.usuario}`;
+            }
+        }
+
+        function registrarEdicao(usuario) {
+            const dados = { timestamp: new Date().toISOString(), usuario: usuario };
+            localStorage.setItem('ultimaEdicao', JSON.stringify(dados));
+            carregarUltimaEdicao();
+            atualizarTituloCenario();
+        }
+
+        function atualizarTituloCenario() {
+            const dataAtual = obterDataAtual();
+            document.getElementById('headerCenario').childNodes[0].textContent = `Cenário ${dataAtual}`;
+        }
+
+        function obterUltimaDataCenario() {
+            let ultimaData = '2026-02-06';
+            dadosChips.forEach(chip => {
+                const datas = Object.keys(chip.historicoCenarios);
+                datas.forEach(data => {
+                    if (data > ultimaData) ultimaData = data;
+                });
+            });
+            return ultimaData;
+        }
+
+        function formatarDataParaExibicao(dataISO) {
+            const [ano, mes, dia] = dataISO.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        function ordenarMunicipiosCustomizado(municipios) {
+            const excecoes = ['HOMOLOGAÇÃO', 'MATURAÇÃO'];
+            const normais = municipios.filter(m => !excecoes.includes(m)).sort();
+            const homologacao = municipios.includes('HOMOLOGAÇÃO') ? ['HOMOLOGAÇÃO'] : [];
+            const maturacao = municipios.includes('MATURAÇÃO') ? ['MATURAÇÃO'] : [];
+            return [...normais, ...homologacao, ...maturacao];
+        }
+
+        function inicializarDashboard() {
+            popularFiltroMunicipios();
+            popularFiltroEvos();
+            atualizarDashboardCards();
+            aplicarFiltros();
+        }
+
+        function popularFiltroMunicipios() {
+            const municipios = [...new Set(dadosChips.filter(c => c.status !== 'Cancelado').map(chip => chip.municipio))];
+            const municipiosOrdenados = ordenarMunicipiosCustomizado(municipios);
+            const select = document.getElementById('filterMunicipio');
+            select.innerHTML = '<option value="">Todos</option>';
+            municipiosOrdenados.forEach(municipio => {
+                const option = document.createElement('option');
+                option.value = municipio;
+                option.textContent = municipio;
+                select.appendChild(option);
+            });
+        }
+
+        function popularFiltroEvos() {
+            const evos = [...new Set(dadosChips.filter(c => c.status !== 'Cancelado').map(chip => chip.evo))];
+            const evosOrdenados = evos.sort((a, b) => {
+                if (a.includes('WPP CONNECT')) return 1;
+                if (b.includes('WPP CONNECT')) return -1;
+                if (a.includes('MATURADOR') && !b.includes('MATURADOR')) return 1;
+                if (!a.includes('MATURADOR') && b.includes('MATURADOR')) return -1;
+                if (a.includes('MATURAR') && !b.includes('MATURAR')) return 1;
+                if (!a.includes('MATURAR') && b.includes('MATURAR')) return -1;
+                const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+                const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+                return numA - numB;
+            });
+            const select = document.getElementById('filterEvo');
+            select.innerHTML = '<option value="">Todos os EVOs</option>';
+            evosOrdenados.forEach(evo => {
+                if (evo && evo !== '-') {
+                    const option = document.createElement('option');
+                    option.value = evo;
+                    option.textContent = evo;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function atualizarDashboardCards() {
+            document.getElementById('totalChips').textContent = dadosFiltrados.length;
+            const municipiosUnicos = [...new Set(dadosFiltrados.map(chip => chip.municipio))];
+            document.getElementById('totalMunicipios').textContent = municipiosUnicos.length;
+            const evosUnicos = [...new Set(dadosFiltrados.map(chip => chip.evo).filter(e => e && e !== '-'))];
+            document.getElementById('totalEvos').textContent = evosUnicos.length;
+            const chipsLigados = dadosFiltrados.filter(chip => chip.cenario.toUpperCase().includes('LIGADO')).length;
+            const chipsDesconectados = dadosFiltrados.filter(chip => chip.cenario.toUpperCase().includes('DESCONECTADO')).length;
+            const chipsConectados = chipsLigados + chipsDesconectados;
+            document.getElementById('chipsAtivos').textContent = chipsConectados;
+            document.getElementById('chipsLigados').textContent = chipsLigados;
+            document.getElementById('chipsDesconectados').textContent = chipsDesconectados;
+            const chipsRestritos = dadosFiltrados.filter(chip => chip.cenario.toUpperCase().includes('RESTRITO')).length;
+            document.getElementById('chipsRestritos').textContent = chipsRestritos;
+            const chipsBanidos = dadosFiltrados.filter(chip => chip.cenario.toUpperCase().includes('BANIDO')).length;
+            document.getElementById('chipsBanidos').textContent = chipsBanidos;
+            const chipsMaturacao = dadosFiltrados.filter(chip => chip.cenario.toUpperCase().includes('MATURAÇÃO') || chip.cenario.toUpperCase().includes('MATURADOR')).length;
+            document.getElementById('chipsMaturacao').textContent = chipsMaturacao;
+        }
+
+        function aplicarFiltros() {
+            const buscaTelefone = document.getElementById('searchTelefone').value.toLowerCase();
+            const buscaAparelho = document.getElementById('searchAparelho').value.toLowerCase();
+            const filtroMunicipio = document.getElementById('filterMunicipio').value;
+            const filtroStatus = document.getElementById('filterStatus').value;
+            const filtroEvo = document.getElementById('filterEvo').value;
+
+            dadosFiltrados = dadosChips.filter(chip => {
+                if (chip.status === 'Cancelado') return false;
+                const matchTelefone = chip.telefone.toLowerCase().includes(buscaTelefone);
+                const matchAparelho = chip.aparelho.toLowerCase().includes(buscaAparelho);
+                const matchMunicipio = !filtroMunicipio || chip.municipio === filtroMunicipio;
+                const matchStatus = !filtroStatus || chip.status === filtroStatus;
+                const matchEvo = !filtroEvo || chip.evo === filtroEvo;
+                return matchTelefone && matchAparelho && matchMunicipio && matchStatus && matchEvo;
+            });
+
+            dadosFiltrados = ordenarDadosPorMunicipio(dadosFiltrados);
+            atualizarDashboardCards();
+            paginaAtual = 1;
+            renderizarTabela();
+        }
+
+        function ordenarDadosPorMunicipio(dados) {
+            const excecoes = ['HOMOLOGAÇÃO', 'MATURAÇÃO'];
+            const normais = dados.filter(d => !excecoes.includes(d.municipio)).sort((a, b) => a.municipio.localeCompare(b.municipio));
+            const homologacao = dados.filter(d => d.municipio === 'HOMOLOGAÇÃO');
+            const maturacao = dados.filter(d => d.municipio === 'MATURAÇÃO');
+            return [...normais, ...homologacao, ...maturacao];
+        }
+
+        function limparFiltros() {
+            document.getElementById('searchTelefone').value = '';
+            document.getElementById('searchAparelho').value = '';
+            document.getElementById('filterMunicipio').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterEvo').value = '';
+            dadosFiltrados = dadosChips.filter(c => c.status !== 'Cancelado');
+            dadosFiltrados = ordenarDadosPorMunicipio(dadosFiltrados);
+            atualizarDashboardCards();
+            paginaAtual = 1;
+            renderizarTabela();
+            mostrarToast('Filtros limpos com sucesso!');
+        }
+
+        function obterCenarioAtual(chip) {
+            const ultimaData = obterUltimaDataCenario();
+            return chip.historicoCenarios[ultimaData]?.cenario || chip.cenario;
+        }
+
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabelaBody');
+            const inicio = (paginaAtual - 1) * itensPorPagina;
+            const fim = inicio + itensPorPagina;
+            const dadosPagina = dadosFiltrados.slice(inicio, fim);
+
+            if (dadosPagina.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="loading">Nenhum registro encontrado</td></tr>';
+                atualizarPaginacao();
+                return;
+            }
+
+            tbody.innerHTML = dadosPagina.map(chip => `
+                <tr>
+                    <td><span class="municipio-badge">${chip.municipio}</span></td>
+                    <td><span class="badge badge-${chip.status.toLowerCase()}">${chip.status}</span></td>
+                    <td><strong>${chip.telefone}</strong></td>
+                    <td>${chip.evo}</td>
+                    <td style="text-align: center;">${chip.aparelho}</td>
+                    <td style="text-align: center;">${chip.sim === 'S1' ? '<span class="badge badge-s1">S1</span>' : chip.sim === 'S2' ? '<span class="badge badge-s2">S2</span>' : chip.sim}</td>
+                    <td style="text-align: center;">${chip.tipoWhatsApp === 'B' ? '<span class="badge badge-business">Business</span>' : chip.tipoWhatsApp === 'M' ? '<span class="badge badge-messenger">Messenger</span>' : chip.tipoWhatsApp}</td>
+                    <td>${obterCenarioAtual(chip)}</td>
+                    <td><button class="btn-icon btn-edit" onclick="solicitarAutenticacao('editar', ${chip.id})" title="Editar">✏️</button></td>
+                </tr>
+            `).join('');
+
+            atualizarPaginacao();
+        }
+
+        function atualizarPaginacao() {
+            const totalPaginas = Math.ceil(dadosFiltrados.length / itensPorPagina);
+            const inicio = (paginaAtual - 1) * itensPorPagina + 1;
+            const fim = Math.min(paginaAtual * itensPorPagina, dadosFiltrados.length);
+            document.getElementById('paginationInfo').textContent = `Mostrando ${inicio} a ${fim} de ${dadosFiltrados.length} registros`;
+            document.getElementById('btnAnterior').disabled = paginaAtual === 1;
+            document.getElementById('btnProxima').disabled = paginaAtual >= totalPaginas;
+        }
+
+        function mudarPagina(direcao) {
+            paginaAtual += direcao;
+            renderizarTabela();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mudarItensPorPagina() {
+            itensPorPagina = parseInt(document.getElementById('itensPorPaginaSelect').value);
+            paginaAtual = 1;
+            renderizarTabela();
+        }
+
+        function ordenarTabela(coluna) {
+            const colunas = ['municipio', 'status', 'telefone', 'evo', 'aparelho', 'sim', 'tipoWhatsApp', 'cenario'];
+            const nomColuna = colunas[coluna];
+
+            if (colunaOrdenacao === coluna) {
+                direcaoOrdenacao = direcaoOrdenacao === 'asc' ? 'desc' : 'asc';
+            } else {
+                colunaOrdenacao = coluna;
+                direcaoOrdenacao = 'asc';
+            }
+
+            if (nomColuna === 'municipio') {
+                const excecoes = ['HOMOLOGAÇÃO', 'MATURAÇÃO'];
+                const normais = dadosFiltrados.filter(d => !excecoes.includes(d.municipio));
+                const homologacao = dadosFiltrados.filter(d => d.municipio === 'HOMOLOGAÇÃO');
+                const maturacao = dadosFiltrados.filter(d => d.municipio === 'MATURAÇÃO');
+                normais.sort((a, b) => {
+                    const valorA = a.municipio.toLowerCase();
+                    const valorB = b.municipio.toLowerCase();
+                    if (valorA < valorB) return direcaoOrdenacao === 'asc' ? -1 : 1;
+                    if (valorA > valorB) return direcaoOrdenacao === 'asc' ? 1 : -1;
+                    return 0;
+                });
+                dadosFiltrados = [...normais, ...homologacao, ...maturacao];
+            } else {
+                dadosFiltrados.sort((a, b) => {
+                    let valorA = nomColuna === 'cenario' ? obterCenarioAtual(a) : String(a[nomColuna]);
+                    let valorB = nomColuna === 'cenario' ? obterCenarioAtual(b) : String(b[nomColuna]);
+                    valorA = valorA.toLowerCase();
+                    valorB = valorB.toLowerCase();
+                    if (valorA < valorB) return direcaoOrdenacao === 'asc' ? -1 : 1;
+                    if (valorA > valorB) return direcaoOrdenacao === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            document.querySelectorAll('th').forEach((th, idx) => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+                if (idx === coluna) {
+                    th.classList.add(direcaoOrdenacao === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                }
+            });
+
+            paginaAtual = 1;
+            renderizarTabela();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            mostrarToast('Tema alterado com sucesso!');
+        }
+
+        function solicitarAutenticacao(modo, id = null) {
+            modoEdicao = modo;
+            registroEditando = id;
+            document.getElementById('authLogin').value = '';
+            document.getElementById('authSenha').value = '';
+            document.getElementById('errorLogin').classList.remove('active');
+            document.getElementById('errorSenha').classList.remove('active');
+            abrirModal('modalAuth');
+        }
+
+        function validarAutenticacao() {
+            const login = document.getElementById('authLogin').value.trim();
+            const senha = document.getElementById('authSenha').value;
+            let valido = true;
+
+            if (!login) {
+                document.getElementById('errorLogin').classList.add('active');
+                document.getElementById('authLogin').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('errorLogin').classList.remove('active');
+                document.getElementById('authLogin').classList.remove('error');
+            }
+
+            if (!senha) {
+                document.getElementById('errorSenha').classList.add('active');
+                document.getElementById('authSenha').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('errorSenha').classList.remove('active');
+                document.getElementById('authSenha').classList.remove('error');
+            }
+
+            if (!valido) return;
+
+            const loginPattern = /^[a-zA-ZÀ-ÿ]+\.[a-zA-ZÀ-ÿ]+$/;
+            if (!loginPattern.test(login)) {
+                mostrarToast('Login deve estar no formato: nome.sobrenome', true);
+                return;
+            }
+
+            if (senha === credenciais.senha) {
+                usuarioLogado = login;
+                fecharModal('modalAuth');
+                if (modoEdicao === 'novo') {
+                    abrirModalEdicao();
+                } else if (modoEdicao === 'editar') {
+                    abrirModalEdicao(registroEditando);
+                }
+            } else {
+                mostrarToast('Senha inválida!', true);
+            }
+        }
+
+        function abrirModalEdicao(id = null) {
+            if (id) {
+                const chip = dadosChips.find(c => c.id === id);
+                if (!chip) return;
+                document.getElementById('modalEditTitle').textContent = 'Editar Registro';
+                document.getElementById('editId').value = chip.id;
+                document.getElementById('editMunicipio').value = chip.municipio;
+                document.getElementById('editStatus').value = chip.status;
+                document.getElementById('editTelefone').value = chip.telefone;
+                document.getElementById('editEvo').value = chip.evo;
+                document.getElementById('editAparelho').value = chip.aparelho;
+                document.getElementById('editSim').value = chip.sim;
+                document.getElementById('editTipoWhatsApp').value = chip.tipoWhatsApp;
+                document.getElementById('editCenario').value = obterCenarioAtual(chip);
+            } else {
+                document.getElementById('modalEditTitle').textContent = 'Cadastrar Novo Registro';
+                document.getElementById('editId').value = '';
+                document.getElementById('editMunicipio').value = '';
+                document.getElementById('editStatus').value = 'Ativo';
+                document.getElementById('editTelefone').value = '';
+                document.getElementById('editEvo').value = '';
+                document.getElementById('editAparelho').value = '';
+                document.getElementById('editSim').value = '';
+                document.getElementById('editTipoWhatsApp').value = '';
+                document.getElementById('editCenario').value = '';
+            }
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+            abrirModal('modalEdit');
+        }
+
+        function salvarRegistro() {
+            const id = document.getElementById('editId').value;
+            const municipio = document.getElementById('editMunicipio').value.trim().toUpperCase();
+            const status = document.getElementById('editStatus').value;
+            const telefone = document.getElementById('editTelefone').value.trim();
+            const evo = document.getElementById('editEvo').value.trim();
+            const aparelho = document.getElementById('editAparelho').value.trim();
+            const sim = document.getElementById('editSim').value;
+            const tipoWhatsApp = document.getElementById('editTipoWhatsApp').value;
+            const cenario = document.getElementById('editCenario').value.trim();
+
+            let valido = true;
+            const campos = [
+                { id: 'editMunicipio', error: 'errorMunicipio', valor: municipio },
+                { id: 'editStatus', error: 'errorStatus', valor: status },
+                { id: 'editTelefone', error: 'errorTelefone', valor: telefone },
+                { id: 'editEvo', error: 'errorEvo', valor: evo },
+                { id: 'editAparelho', error: 'errorAparelho', valor: aparelho },
+                { id: 'editSim', error: 'errorSim', valor: sim },
+                { id: 'editTipoWhatsApp', error: 'errorTipoWhatsApp', valor: tipoWhatsApp }
+            ];
+
+            campos.forEach(campo => {
+                if (!campo.valor) {
+                    document.getElementById(campo.error).classList.add('active');
+                    document.getElementById(campo.id).classList.add('error');
+                    valido = false;
+                } else {
+                    document.getElementById(campo.error).classList.remove('active');
+                    document.getElementById(campo.id).classList.remove('error');
+                }
+            });
+
+            if (!valido) {
+                mostrarToast('Preencha todos os campos obrigatórios!', true);
+                return;
+            }
+
+            const estado = detectarEstadoPorTelefone(telefone);
+            let aparelhoFormatado = aparelho;
+            if (!aparelho.includes(' - PA') && !aparelho.includes(' - RJ') && aparelho !== 'RESTRITO' && aparelho !== 'BANIDO' && aparelho !== '-' && aparelho !== '') {
+                aparelhoFormatado = formatarAparelho(aparelho, estado);
+            }
+            const evoFormatado = formatarEvo(evo);
+            const chaveDataAtual = obterChaveDataAtual();
+
+            if (id) {
+                const index = dadosChips.findIndex(c => c.id === parseInt(id));
+                if (index !== -1) {
+                    dadosChips[index] = {
+                        ...dadosChips[index],
+                        municipio, status, telefone, evo: evoFormatado, aparelho: aparelhoFormatado, sim, tipoWhatsApp,
+                        cenario: cenario || dadosChips[index].cenario
+                    };
+
+                    if (!dadosChips[index].historicoCenarios) {
+                        dadosChips[index].historicoCenarios = {};
+                    }
+                    dadosChips[index].historicoCenarios[chaveDataAtual] = {
+                        cenario: cenario || dadosChips[index].cenario,
+                        usuario: usuarioLogado
+                    };
+
+                    salvarDadosNoLocalStorage();
+                    registrarEdicao(usuarioLogado);
+
+                    if (status === 'Cancelado') {
+                        setTimeout(() => {
+                            dadosChips.splice(index, 1);
+                            salvarDadosNoLocalStorage();
+                            aplicarFiltros();
+                            popularFiltroMunicipios();
+                            popularFiltroEvos();
+                        }, 1000);
+                        mostrarToast('Registro cancelado e removido com sucesso!');
+                    } else {
+                        mostrarToast('Registro atualizado com sucesso!');
+                    }
+                }
+            } else {
+                const historico = {};
+                historico[chaveDataAtual] = { cenario: cenario || 'Novo registro', usuario: usuarioLogado };
+                const novoId = dadosChips.length > 0 ? Math.max(...dadosChips.map(c => c.id)) + 1 : 1;
+                const novoRegistro = {
+                    id: novoId,
+                    municipio, status, telefone, evo: evoFormatado, aparelho: aparelhoFormatado, sim, tipoWhatsApp,
+                    cenario: cenario || 'Novo registro',
+                    historicoCenarios: historico
+                };
+                dadosChips.push(novoRegistro);
+                salvarDadosNoLocalStorage();
+                registrarEdicao(usuarioLogado);
+                mostrarToast('Registro cadastrado com sucesso!');
+            }
+
+            fecharModal('modalEdit');
+            aplicarFiltros();
+            popularFiltroMunicipios();
+            popularFiltroEvos();
+        }
+
+        function abrirModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function mostrarLoading(mostrar) {
+            const overlay = document.getElementById('loadingOverlay');
+            mostrar ? overlay.classList.add('active') : overlay.classList.remove('active');
+        }
+
+        function mostrarToast(mensagem, erro = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.className = 'toast active';
+            if (erro) toast.classList.add('error');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+
+        function exportarPDF() {
+            mostrarLoading(true);
+            setTimeout(() => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('landscape');
+                    const dataAtualFormatada = obterDataAtual();
+
+                    doc.setFontSize(20);
+                    doc.setTextColor(37, 99, 235);
+                    doc.text('Dashboard Serviço de Mensageria', 15, 15);
+
+                    doc.setFontSize(14);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text('Controle de Aparelhos, Chips e APIs', 15, 23);
+
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    const dataHoraAtual = new Date().toLocaleString('pt-BR');
+                    doc.text(`Gerado em: ${dataHoraAtual}`, 15, 30);
+                    doc.text(`Total de registros: ${dadosFiltrados.length}`, 15, 35);
+                    doc.setDrawColor(226, 232, 240);
+                    doc.line(15, 38, 282, 38);
+
+                    const headers = [['Projeto', 'Status', 'Telefone', 'EVO', 'Aparelho', 'SIM', 'Tipo WhatsApp', `Cenário ${dataAtualFormatada}`]];
+                    const dados = dadosFiltrados.map(chip => [
+                        chip.municipio, chip.status, chip.telefone, chip.evo, chip.aparelho, chip.sim,
+                        chip.tipoWhatsApp === 'B' ? 'Business' : chip.tipoWhatsApp === 'M' ? 'Messenger' : chip.tipoWhatsApp,
+                        obterCenarioAtual(chip)
+                    ]);
+
+                    doc.autoTable({
+                        head: headers, body: dados, startY: 42,
+                        styles: { fontSize: 7, cellPadding: 2 },
+                        headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' },
+                        alternateRowStyles: { fillColor: [248, 250, 252] },
+                        margin: { left: 15, right: 15 }
+                    });
+
+                    const pageCount = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        doc.setFontSize(8);
+                        doc.setTextColor(150, 150, 150);
+                        doc.text(`Página ${i} de ${pageCount} | ECO Sistemas © ${new Date().getFullYear()}`,
+                            doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+                    }
+
+                    doc.save(`dashboard-eco-${new Date().toISOString().slice(0, 10)}.pdf`);
+                    mostrarToast('✅ PDF exportado com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao exportar PDF:', error);
+                    mostrarToast('❌ Erro ao exportar PDF', true);
+                } finally {
+                    mostrarLoading(false);
+                }
+            }, 300);
+        }
+
+        function exportarExcel() {
+            mostrarLoading(true);
+            setTimeout(() => {
+                try {
+                    const wb = XLSX.utils.book_new();
+                    const todasDatas = new Set();
+                    dadosFiltrados.forEach(chip => {
+                        Object.keys(chip.historicoCenarios || {}).forEach(data => todasDatas.add(data));
+                    });
+                    const datasOrdenadas = Array.from(todasDatas).sort();
+
+                    const dadosExport = dadosFiltrados.map(chip => {
+                        const linha = {
+                            'Projeto': chip.municipio,
+                            'Status': chip.status,
+                            'Telefone': chip.telefone,
+                            'EVO': chip.evo,
+                            'Aparelho Telefônico': chip.aparelho,
+                            'SIM': chip.sim,
+                            'Tipo de WhatsApp': chip.tipoWhatsApp === 'B' ? 'Business' : chip.tipoWhatsApp === 'M' ? 'Messenger' : chip.tipoWhatsApp
+                        };
+
+                        datasOrdenadas.forEach(data => {
+                            const dataFormatada = formatarDataParaExibicao(data);
+                            const usuario = chip.historicoCenarios[data]?.usuario || 'sistema';
+                            const tituloColuna = `Cenário ${dataFormatada} ${usuario}`;
+                            linha[tituloColuna] = chip.historicoCenarios[data]?.cenario || chip.cenario;
+                        });
+
+                        return linha;
+                    });
+
+                    const ws = XLSX.utils.json_to_sheet(dadosExport);
+                    const numColunas = 7 + datasOrdenadas.length;
+                    ws['!cols'] = Array(numColunas).fill({ wch: 20 });
+                    ws['!cols'][0] = { wch: 18 };
+                    ws['!cols'][1] = { wch: 12 };
+                    ws['!cols'][2] = { wch: 18 };
+
+                    XLSX.utils.book_append_sheet(wb, ws, 'Controle de Chips');
+                    XLSX.writeFile(wb, `dashboard-eco-${new Date().toISOString().slice(0, 10)}.xlsx`);
+                    mostrarToast('✅ Excel exportado com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao exportar Excel:', error);
+                    mostrarToast('❌ Erro ao exportar Excel', true);
+                } finally {
+                    mostrarLoading(false);
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
